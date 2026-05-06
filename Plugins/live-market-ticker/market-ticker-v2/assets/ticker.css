@@ -1,0 +1,362 @@
+/* =========================================================
+   Live Market Ticker — Estilos
+   ========================================================= */
+
+/* ── Sección principal ── */
+.lmt-ticker-section {
+    position: relative;
+    border-top:    1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    background:    #ffffff;
+    overflow:      hidden;
+    font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .lmt-ticker-section {
+        border-color: #1e293b;
+        background:   #15202b;
+    }
+}
+
+/* WordPress dark mode via body class */
+body.dark-mode .lmt-ticker-section,
+.dark .lmt-ticker-section {
+    border-color: #1e293b;
+    background:   #15202b;
+}
+
+/* ── Contenedor con scroll ── */
+.lmt-ticker-track {
+    padding: 1.25rem 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Fade edges */
+.lmt-ticker-track::before,
+.lmt-ticker-track::after {
+    content:  '';
+    position: absolute;
+    top:    0;
+    bottom: 0;
+    width:  4rem;
+    z-index: 2;
+    pointer-events: none;
+}
+.lmt-ticker-track::before {
+    left: 0;
+    background: linear-gradient(to right, #fff 0%, transparent 100%);
+}
+.lmt-ticker-track::after {
+    right: 0;
+    background: linear-gradient(to left, #fff 0%, transparent 100%);
+}
+
+/* Modo oscuro fade */
+body.dark-mode .lmt-ticker-track::before,
+.dark .lmt-ticker-track::before {
+    background: linear-gradient(to right, #15202b 0%, transparent 100%);
+}
+body.dark-mode .lmt-ticker-track::after,
+.dark .lmt-ticker-track::after {
+    background: linear-gradient(to left, #15202b 0%, transparent 100%);
+}
+
+/* ── Inner scroll band ── */
+.lmt-ticker-inner {
+    display:    flex;
+    gap:        2.5rem;
+    align-items: center;
+    width:      max-content;
+}
+
+/* ── Animación scroll ── */
+@keyframes lmt-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+.lmt-ticker-inner.lmt-animate {
+    animation: lmt-scroll linear infinite;
+}
+
+.lmt-ticker-inner:hover { animation-play-state: paused; }
+
+/* ── Tarjeta de activo ── */
+.lmt-item {
+    display:     flex;
+    align-items: center;
+    gap:         0.75rem;
+    min-width:   220px;
+    cursor:      default;
+    user-select: none;
+    transition:  opacity 0.2s;
+}
+.lmt-item:hover { opacity: 0.8; }
+
+/* ── Badge con logo imagen ── */
+.lmt-badge.lmt-badge-img {
+    background: #1e293b;
+    padding: 0;
+    overflow: hidden;
+}
+.lmt-badge.lmt-badge-img img {
+    width:  100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    display: block;
+}
+
+/* ── Badge con SVG inline ── */
+.lmt-badge.lmt-badge-svg {
+    padding: 0;
+    overflow: hidden;
+}
+.lmt-badge.lmt-badge-svg svg {
+    width:  100%;
+    height: 100%;
+    display: block;
+    border-radius: 50%;
+}
+
+/* ── Badge de ticker ── */
+.lmt-badge {
+    width:  2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    font-size:  0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+/* Colores de badges */
+.lmt-badge-orange  { background: #fff7ed; color: #ea580c; }
+.lmt-badge-blue    { background: #eff6ff; color: #2563eb; }
+.lmt-badge-purple  { background: #faf5ff; color: #9333ea; }
+.lmt-badge-yellow  { background: #fefce8; color: #ca8a04; }
+.lmt-badge-sky     { background: #f0f9ff; color: #0284c7; }
+.lmt-badge-teal    { background: #f0fdfa; color: #0d9488; }
+.lmt-badge-amber   { background: #fffbeb; color: #d97706; }
+.lmt-badge-pink    { background: #fdf2f8; color: #db2777; }
+.lmt-badge-green   { background: #f0fdf4; color: #16a34a; }
+.lmt-badge-indigo  { background: #eef2ff; color: #4f46e5; }
+.lmt-badge-slate   { background: #f8fafc; color: #475569; }
+
+/* Dark mode badges */
+body.dark-mode .lmt-badge-orange,
+.dark .lmt-badge-orange { background: rgba(234,88,12,.15); }
+body.dark-mode .lmt-badge-blue,
+.dark .lmt-badge-blue   { background: rgba(37,99,235,.15); }
+body.dark-mode .lmt-badge-purple,
+.dark .lmt-badge-purple { background: rgba(147,51,234,.15); }
+body.dark-mode .lmt-badge-slate,
+.dark .lmt-badge-slate  { background: rgba(71,85,105,.15); color: #94a3b8; }
+
+/* ── Info del activo ── */
+.lmt-info { display: flex; flex-direction: column; gap: 0.15rem; }
+
+.lmt-label {
+    font-size:   0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0f172a;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.lmt-price-row {
+    display:     flex;
+    align-items: center;
+    gap:         0.375rem;
+}
+
+.lmt-price {
+    font-size:   0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+    font-variant-numeric: tabular-nums;
+}
+
+.lmt-change {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+.lmt-change-up   { color: #16a34a; background: #f0fdf4; }
+.lmt-change-down { color: #dc2626; background: #fef2f2; }
+.lmt-change-flat { color: #64748b; background: #f1f5f9; }
+
+/* Dark mode text */
+body.dark-mode .lmt-label,
+.dark .lmt-label { color: #e2e8f0; }
+body.dark-mode .lmt-price,
+.dark .lmt-price { color: #f1f5f9; }
+
+/* ── Sparkline SVG ── */
+.lmt-sparkline {
+    width:  80px;
+    height: 36px;
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+/* Eliminar colores de trazo via CSS ya que ahora van inline */
+.lmt-sparkline path { transition: opacity 0.3s; }
+.lmt-item:hover .lmt-sparkline path { opacity: 0.75; }
+
+/* ── Loading skeletons ── */
+.lmt-skeleton {
+    width:  200px;
+    height: 40px;
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: lmt-shimmer 1.4s infinite;
+    flex-shrink: 0;
+}
+
+@keyframes lmt-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+
+
+/* ── Número flash cuando actualiza ── */
+@keyframes lmt-flash-up   { 0%,100%{background:transparent} 30%{background:#dcfce7} }
+@keyframes lmt-flash-down { 0%,100%{background:transparent} 30%{background:#fee2e2} }
+.lmt-flash-up   { animation: lmt-flash-up   0.6s ease; border-radius: 3px; }
+.lmt-flash-down { animation: lmt-flash-down 0.6s ease; border-radius: 3px; }
+
+/* ── Error state ── */
+.lmt-error-msg {
+    padding:    1rem 1.5rem;
+    font-size:  0.8rem;
+    color:      #ef4444;
+    text-align: center;
+}
+
+/* ── Tooltip global (position:fixed, renderizado en body) ── */
+#lmt-global-tooltip {
+    position:      fixed;
+    z-index:       2147483647; /* máximo posible, sobre todo */
+    width:         210px;
+    background:    #0f172a;
+    border:        1px solid #334155;
+    border-radius: 12px;
+    padding:       14px 16px;
+    box-shadow:    0 12px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3);
+    pointer-events: none;
+    opacity:       0;
+    visibility:    hidden;
+    transform:     translateY(4px);
+    transition:    opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+    font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#lmt-global-tooltip.lmt-tt-visible {
+    opacity:    1;
+    visibility: visible;
+    transform:  translateY(0);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Flecha apuntando hacia abajo (tooltip encima del item) */
+.lmt-tt-arrow {
+    position:  absolute;
+    bottom:    -7px;
+    width:     12px;
+    height:    12px;
+    background: #0f172a;
+    border-right: 1px solid #334155;
+    border-bottom: 1px solid #334155;
+    transform: rotate(45deg);
+    margin-left: -6px;
+}
+
+/* Flecha apuntando hacia arriba (tooltip debajo del item) */
+#lmt-global-tooltip.lmt-tt-below .lmt-tt-arrow {
+    bottom: auto;
+    top:    -7px;
+    transform: rotate(-135deg);
+}
+
+/* Cabecera */
+.lmt-tt-header {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     baseline;
+    margin-bottom:   8px;
+    gap:             6px;
+}
+.lmt-tt-name {
+    font-size:   0.8rem;
+    font-weight: 700;
+    color:       #e2e8f0;
+    white-space: nowrap;
+    overflow:    hidden;
+    text-overflow: ellipsis;
+}
+.lmt-tt-symbol {
+    font-size:   0.65rem;
+    color:       #64748b;
+    font-family: monospace;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Precio */
+.lmt-tt-price {
+    font-size:   1.15rem;
+    font-weight: 700;
+    color:       #f8fafc;
+    margin-bottom: 3px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Cambio */
+.lmt-tt-change {
+    font-size:     0.75rem;
+    font-weight:   600;
+    margin-bottom: 10px;
+}
+.lmt-tt-up   { color: #22c55e; }
+.lmt-tt-down { color: #ef4444; }
+.lmt-tt-flat { color: #94a3b8; }
+
+/* Grid max/min/vol */
+.lmt-tt-grid {
+    display:               grid;
+    grid-template-columns: 1fr 1fr;
+    gap:                   6px 8px;
+    border-top:            1px solid #1e293b;
+    padding-top:           8px;
+}
+.lmt-tt-cell {
+    display:        flex;
+    flex-direction: column;
+    gap:            2px;
+}
+.lmt-tt-full { grid-column: 1 / -1; }
+.lmt-tt-lbl {
+    font-size:      0.62rem;
+    color:          #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.lmt-tt-val {
+    font-size:   0.78rem;
+    font-weight: 600;
+    color:       #cbd5e1;
+    font-variant-numeric: tabular-nums;
+}

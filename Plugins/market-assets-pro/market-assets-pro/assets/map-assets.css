@@ -1,0 +1,7 @@
+/* Market Assets Pro v4 */
+@keyframes map-spin-kf { to { transform:rotate(360deg); } }
+.map-spin { display:inline-block; animation:map-spin-kf .8s linear infinite; }
+#map-tbody canvas { vertical-align:middle; }
+.map-row:hover { background:rgba(148,163,184,.05); }
+.map-view-btn:hover { background:#3b82f6 !important; color:#fff !important; border-color:#3b82f6 !important; }
+@media(max-width:640px) { .map-kpis-grid { grid-template-columns:repeat(3,1fr) !important; } }

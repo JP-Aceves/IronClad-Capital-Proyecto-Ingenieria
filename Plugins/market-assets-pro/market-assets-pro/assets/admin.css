@@ -1,0 +1,74 @@
+/* Market Assets Pro — Admin CSS */
+.map-admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 20px;
+}
+@media (max-width: 900px) {
+  .map-admin-grid { grid-template-columns: 1fr; }
+}
+.map-card {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 6px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.map-card h2 { margin-top: 0; color: #1d2327; }
+.map-card h3 { color: #1d2327; margin: 18px 0 6px; }
+.map-card code {
+  display: inline-block;
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: .875rem;
+  word-break: break-all;
+}
+.map-card p.description { color: #646970; font-size: .875rem; }
+
+.map-asset-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f1;
+}
+.map-asset-row:last-child { border-bottom: none; }
+.map-asset-row input[type="text"] {
+  flex: 1;
+  min-width: 80px;
+}
+.map-asset-row select { min-width: 90px; }
+
+.map-badge {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: .75rem;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: center;
+}
+/* Color badges en admin */
+.map-color-blue   { background: #dbeafe; color: #1d4ed8; }
+.map-color-orange { background: #ffedd5; color: #c2410c; }
+.map-color-purple { background: #ede9fe; color: #7c3aed; }
+.map-color-green  { background: #dcfce7; color: #16a34a; }
+.map-color-yellow { background: #fef9c3; color: #a16207; }
+.map-color-amber  { background: #fef3c7; color: #b45309; }
+.map-color-teal   { background: #ccfbf1; color: #0f766e; }
+.map-color-indigo { background: #e0e7ff; color: #4338ca; }
+.map-color-slate  { background: #f1f5f9; color: #475569; }
+.map-color-red    { background: #fee2e2; color: #b91c1c; }
+.map-color-pink   { background: #fce7f3; color: #be185d; }
+
+.map-add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.map-add-row input,
+.map-add-row select { flex: 1; min-width: 100px; }
