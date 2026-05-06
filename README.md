@@ -170,5 +170,3 @@ El notebook principal utiliza **XGBoost** para realizar predicciones de precios 
 - **Adrian-Duque**
 - **Jose Pablo Aceves**
 - **Ignacio del Peso**
-**Fase**: 2 (Segunda Entrega)  
-**Estado**: ✅ En desarrollo activo
