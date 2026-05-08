@@ -5,6 +5,11 @@
 > Análisis avanzado de criptomonedas, predicción de precios y presencia web integrada
 
 ---
+## 🔗 Links
+
+- Documentación: https://adrian-duque.github.io/ironclad-fase2/
+- Presentación: https://adrian-duque.github.io/ironclad-fase2/ppt.html#1
+---
 
 ## 📋 Descripción General
 
