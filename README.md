@@ -7,8 +7,11 @@
 ---
 ## 🔗 Links
 
-- Documentación: https://jp-aceves.github.io/ironclad-capital/
+- Documentación Oficial: 
+- Documentación Visual: https://jp-aceves.github.io/ironclad-capital/
 - Presentación: https://jp-aceves.github.io/ironclad-capital/ppt.html
+- Blog: https://substack.com/@ironcladcapital
+- 
 ---
 
 ## 📋 Descripción General
