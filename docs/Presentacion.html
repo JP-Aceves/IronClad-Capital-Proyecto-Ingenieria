@@ -1,0 +1,2275 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>IronClad Capital — Fase 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="deck-stage.js"></script>
+
+<script type="application/json" id="speaker-notes">
+[
+"Buenos días. IronClad Capital nace de una idea simple: los datos no mienten, las emociones sí. Somos una plataforma financiera que combina datos reales de mercado, modelos de predicción auditables y segmentación de clientes basada en evidencia. Hoy os presentamos la Fase 2, donde todo esto funciona de verdad.",
+"Esta es la estructura. Cuatro bloques: contexto y objetivos, análisis financiero, predicciones con MAE, y segmentación de clientes. Vamos a verlo en orden.",
+"Empezamos por el contexto. Primer bloque.",
+"Nuestra misión: democratizar la comprensión de carteras mixtas reuniendo activos digitales e instrumentos tradicionales. El motor es Python con yfinance, datos en tiempo real de Yahoo Finance, sin preprocesado manual. Análisis objetivo, decisiones basadas en datos históricos.",
+"",
+"En la Fase 2 cubrimos cinco hitos: descarga y limpieza de datos de los tres activos, visualización avanzada con rendimientos acumulados y comparativa de volatilidad, modelado predictivo con WMA evaluado por MAE, segmentación real sobre 12.000 registros de Kaggle, y validación del sistema con datos de mercado reales.",
+"Trabajamos tres activos muy distintos. LINK, el oráculo de DeFi, alta volatilidad y alto retorno. DOT, infraestructura blockchain, más estable. Y ITA, el ETF de defensa americano, el ancla institucional de la cartera. Tres perfiles riesgo-retorno completamente diferentes.",
+"",
+"",
+"",
+"Pasamos al análisis financiero. Segundo bloque.",
+"Los rendimientos acumulados hablan solos. LINK sube un 187%, DOT un 134%, ITA un 62%. Pero la volatilidad anualizada de LINK es del 82%. La clave no es quién sube más, sino quién compensa mejor el riesgo. Y ahí gana ITA con un Sharpe Ratio de 1.43, la mejor compensación riesgo-retorno del universo analizado. Además, su correlación con LINK es prácticamente nula, -0.08, lo que lo convierte en el ancla perfecta de cualquier cartera mixta.",
+"El Sharpe Ratio de ITA confirma que, ajustado por riesgo, el activo tradicional ofrece la mejor compensación. Esto justifica su papel central en las carteras diversificadas de la Fase 2.",
+"Tercer bloque: predicciones y error MAE.",
+"Implementamos un modelo de media móvil ponderada más regresión lineal sobre ventana deslizante. La métrica principal es el MAE, que mide la desviación promedio en la misma unidad que el activo. A 1 día, MAE de LINK es 0.41 dólares. A 5 días sube a 1.87. A 10 días, 3.94. A 15 días, 6.23. Crece de forma aproximadamente lineal con el horizonte. Tres razones: acumulación de errores, eventos exógenos, y cambios de régimen del mercado. La plataforma lo muestra con honestidad: predicciones tácticas de 1 a 5 días, y siempre con intervalos de confianza explícitos a horizontes mayores. Transparencia como diferenciador.",
+"",
+"Cuarto bloque: segmentación y perfiles. Os lo cuenta mi compañero.",
+"Tres arquetipos. Ex-Víctima del Hype, 8.983 clientes, el 74.9%: jóvenes con experiencia limitada que han tomado decisiones emocionales. Mayor segmento en volumen y el más receptivo al posicionamiento educativo. Inversor Híbrido, 1.884, el 15.7%: ingresos un 43% por encima de la media, alta tolerancia al riesgo. El de mayor valor económico por unidad. Y Riesgo Controlado, 1.133, el 9.4%: tolera menos pérdidas pero quiere exposición controlada al blockchain. El de mayor fidelización potencial.",
+"Para entender a nuestros clientes usamos el Finance Trends and Behaviour Dataset de Kaggle: 12.000 registros reales con variables como edad, ingresos, experiencia financiera, tolerancia al riesgo y porcentaje en activos digitales. Aplicamos una segmentación basada en reglas con umbrales dinámicos calculados sobre el propio dataset, no constantes fijas. Esto hace que la distribución sea robusta aunque cambie la composición de los datos. Los criterios: experiencia, tolerancia al riesgo e ingresos.",
+"Cada perfil tiene una composición de cartera distinta. El Inversor Híbrido: 40% LINK, 25% DOT, 35% ITA. La Ex-Víctima del Hype: 30% LINK, 10% DOT, 60% ITA, más protección. Y el Riesgo Controlado: 10% LINK, 20% DOT, 70% ITA, con ITA como ancla institucional dominante. El uso de ITA al 70% en perfiles conservadores reduce la covarianza y protege el capital ante caídas drásticas en el mercado cripto.",
+"",
+"",
+"Para cerrar. Validación técnica: el pipeline funciona con datos reales. Oportunidad de negocio: el 75% del mercado es receptivo al posicionamiento educativo, el Inversor Híbrido es el cliente de mayor valor por unidad. En un mercado lleno de predicciones vacías, nosotros mostramos los datos tal como son.",
+"Gracias. Quedamos abiertos a preguntas. La Fase 3 incorporará optimización con LSTM y Prophet."
+]
+</script>
+
+<style>
+  :root {
+    /* Brand palette — editorial fintech */
+    /* Institutional blues — Bloomberg / FT / financial press */
+    --ink: #0A1628;            /* deep navy */
+    --ink-2: #0F1E33;
+    --ink-3: #16263F;
+    --steel: #2C3E5C;
+    --steel-2: #5A6B85;
+    --bone: #EEF2F7;           /* cool off-white */
+    --bone-2: #DDE4ED;
+    --bone-3: #B9C4D2;
+    --line: #1F3050;
+    --line-bone: #C5D0DD;
+
+    /* Blue accents — institutional */
+    --accent: #2E5BBA;         /* primary blue */
+    --accent-2: #5A85D9;       /* lighter blue */
+    --accent-3: #1A3D85;       /* deeper blue */
+    --steel-blue: #3A5F8F;
+    --steel-blue-2: #6E8DAE;
+
+    /* Asset colors — all blue family with subtle differentiation */
+    --link: #4A7CC9;          /* mid blue */
+    --dot:  #6E8DAE;          /* steel blue */
+    --ita:  #1A3D85;          /* deep institutional */
+
+    /* Data signals (used sparingly for + / − only) */
+    --warn: #8B3A2E;
+    --good: #2E6B5A;
+
+    --serif: 'Inter', system-ui, sans-serif;
+    --sans:  'Inter', ui-sans-serif, system-ui, sans-serif;
+    --mono:  'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; color: var(--bone); font-family: var(--sans); }
+
+  deck-stage { background: #000; }
+
+  /* Every slide */
+  section[data-slide] {
+    width: 1920px; height: 1080px;
+    position: relative;
+    background: var(--ink);
+    color: var(--bone);
+    overflow: hidden;
+    font-family: var(--sans);
+  }
+
+  /* ============== SHARED ELEMENTS ============== */
+  .grain {
+    position:absolute; inset:0; pointer-events:none; opacity:.04; mix-blend-mode:overlay;
+    background-image:
+      radial-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+      radial-gradient(rgba(0,0,0,.6) 1px, transparent 1px);
+    background-size: 3px 3px, 5px 5px;
+    background-position: 0 0, 1px 2px;
+  }
+  .vignette {
+    position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(120% 80% at 50% 0%, transparent 40%, rgba(0,0,0,.45) 100%);
+  }
+
+  .chrome {
+    position:absolute; left:64px; right:64px; top:48px;
+    display:flex; align-items:center; justify-content:space-between;
+    font-family: var(--mono); font-size:13px; letter-spacing:.18em; text-transform:uppercase;
+    color: var(--steel-2);
+  }
+  .chrome .mark { display:flex; align-items:center; gap:14px; color: var(--bone); }
+  .chrome .mark .seal {
+    width:22px; height:22px; border:1.5px solid var(--bone); border-radius:2px;
+    display:grid; place-items:center; font-family:var(--serif); font-style:italic; font-size:14px;
+    color:var(--bone); padding-bottom:2px;
+  }
+  .chrome .pill { padding:6px 12px; border:1px solid var(--line); border-radius:999px; }
+
+  .footer {
+    position:absolute; left:64px; right:64px; bottom:44px;
+    display:flex; align-items:center; justify-content:space-between;
+    font-family: var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+    color: var(--steel-2);
+  }
+  .footer .num { font-family: var(--mono); font-weight: 500; font-size: 18px; color:var(--bone); letter-spacing:.05em; text-transform:none; }
+
+  .rule { height:1px; background: var(--line); }
+  .rule-bone { height:1px; background: var(--line-bone); }
+
+  /* Bone (light) variant */
+  section[data-theme="bone"] { background: var(--bone); color: var(--ink); }
+  section[data-theme="bone"] .chrome { color: var(--steel); }
+  section[data-theme="bone"] .chrome .mark { color: var(--ink); }
+  section[data-theme="bone"] .chrome .mark .seal { border-color: var(--ink); color: var(--ink); }
+  section[data-theme="bone"] .chrome .pill { border-color: var(--line-bone); }
+  section[data-theme="bone"] .footer { color: var(--steel); }
+  section[data-theme="bone"] .footer .num { color: var(--ink); }
+  section[data-theme="bone"] .rule { background: var(--line-bone); }
+
+  /* Type primitives */
+  .eyebrow { font-family: var(--mono); font-size:13px; letter-spacing:.22em; text-transform:uppercase; color: var(--accent-2); font-weight: 500; }
+  .display { font-family: var(--sans); font-weight: 600; line-height: 0.92; letter-spacing:-0.03em; }
+  .ital { font-family: var(--sans); font-weight: inherit; font-style: normal; letter-spacing: inherit; color: inherit; }
+  /* Global de-italicizer — keep everything upright */
+  section[data-slide] *, .ital, .ital * { font-style: normal !important; }
+  /* Unify weight within headings/titles — no mixing bold + light in same line */
+  h1 .ital, h2 .ital, h3 .ital, h4 .ital, h5 .ital,
+  .cover h1 .ital, .divider h2 .ital, h3.title .ital,
+  .closing h1 .ital, .sharpe .lhs .big .ital,
+  .mission .pillar h4 .ital, .asset .a-name .ital,
+  .concl .col h4 .ital, .alloc-quote b, .concl-quote b {
+    font-weight: inherit !important;
+  }
+  .mono { font-family: var(--mono); }
+
+  /* ============== SLIDE 1 — COVER ============== */
+  .cover {
+    background:
+      radial-gradient(80% 60% at 80% 30%, rgba(46,91,186,.18), transparent 60%),
+      radial-gradient(60% 50% at 10% 90%, rgba(26,61,133,.25), transparent 60%),
+      var(--ink);
+  }
+  .cover .grid-bg {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(242,237,228,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(242,237,228,.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(80% 80% at 50% 50%, black 30%, transparent 90%);
+  }
+  .cover .body {
+    position:absolute; left:96px; right:96px; top:200px; bottom:160px;
+    display:grid; grid-template-columns: 1.3fr 1fr; gap: 80px; align-items: end;
+  }
+  .cover h1 {
+    font-family: var(--sans); font-weight: 700; font-size: 200px; line-height: .9;
+    letter-spacing: -0.045em; color: var(--bone);
+  }
+  .cover h1 .ital { color: var(--accent-2); font-weight: 300; font-style: italic; letter-spacing: -0.04em; }
+  .cover .meta {
+    border-left: 1px solid var(--line);
+    padding-left: 40px;
+    display:flex; flex-direction:column; gap: 28px;
+  }
+  .cover .meta .row { display:flex; flex-direction:column; gap: 6px; }
+  .cover .meta .label { font-family: var(--mono); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--steel-2); }
+  .cover .meta .val { font-family: var(--sans); font-weight: 500; font-size: 24px; color: var(--bone); letter-spacing: -0.01em; }
+  .cover .meta .val.italic { font-style: italic; font-weight: 400; }
+  .cover .ticker {
+    position:absolute; left:0; right:0; bottom:80px;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding: 16px 96px;
+    display:flex; gap:80px; align-items:center;
+    font-family: var(--mono); font-size: 14px; letter-spacing:.05em; color: var(--steel-2);
+    overflow:hidden; white-space: nowrap;
+  }
+  .ticker .tk { display:inline-flex; gap: 16px; align-items:baseline; }
+  .ticker .tk .sym { color: var(--bone); letter-spacing:.15em; }
+  .ticker .tk .v { color: var(--bone-2); }
+  .ticker .tk .up { color: #6FB07A; }
+  .ticker .tk .dn { color: #D87060; }
+  .ticker .sep { color: var(--steel); }
+
+  /* ============== SECTION DIVIDERS ============== */
+  .divider {
+    background: var(--ink);
+  }
+  .divider::before {
+    content:""; position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(0,0,0,.5) 100%),
+      radial-gradient(70% 50% at 70% 50%, rgba(200,128,26,.15), transparent 60%);
+  }
+  .divider .body {
+    position:absolute; left:96px; right:96px; bottom:160px; top:300px;
+    display:grid; grid-template-columns: 1fr; align-content: end; gap: 32px;
+  }
+  .divider .num {
+    font-family: var(--sans); font-weight: 200; font-size: 360px; line-height:.9;
+    color: transparent; -webkit-text-stroke: 1.5px var(--bone-3); opacity:.35;
+    position:absolute; top:140px; right:96px;
+    letter-spacing: -0.04em;
+  }
+  .divider h2 {
+    font-family: var(--sans); font-weight: 600; font-size: 140px; line-height:.95; letter-spacing:-0.045em;
+    color: var(--bone); max-width: 1400px;
+  }
+  .divider h2 .ital { color: var(--accent-2); font-weight: 300; font-style: italic; }
+  .divider .lede {
+    font-family: var(--sans); font-weight: 300; font-size: 26px; line-height:1.45; color: var(--bone-3);
+    max-width: 800px;
+  }
+  .divider .tag {
+    display:inline-flex; gap: 14px; align-items:center;
+    font-family: var(--mono); font-size: 14px; letter-spacing:.22em; text-transform:uppercase;
+    color: var(--accent-2); font-weight: 500;
+  }
+  .divider .tag::before { content:""; width:48px; height:1px; background: var(--accent-2); }
+
+  /* ============== GENERIC CONTENT ============== */
+  .content {
+    position:absolute; left:96px; right:96px; top:140px; bottom:120px;
+    display:flex; flex-direction:column;
+  }
+  h3.title {
+    font-family: var(--sans); font-weight: 600; font-size: 88px; line-height:.98; letter-spacing:-0.04em;
+    color: var(--bone);
+  }
+  section[data-theme="bone"] h3.title { color: var(--ink); }
+  h3.title .ital { color: var(--accent); font-weight: 300; font-style: italic; }
+  section[data-theme="bone"] h3.title .ital { color: var(--accent-3); }
+
+  /* Asset cards */
+  .asset-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 64px; }
+  .asset {
+    border: 1px solid var(--line); padding: 48px 40px; position:relative;
+    background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    min-height: 460px; display:flex; flex-direction:column; gap: 24px;
+  }
+  .asset .ticker-tag {
+    font-family: var(--mono); font-size: 14px; letter-spacing:.22em;
+    color: var(--ink); padding: 6px 12px; align-self: flex-start;
+  }
+  .asset .a-name {
+    font-family: var(--sans); font-weight: 600; font-size: 56px; line-height:.95; letter-spacing:-0.03em;
+    color: var(--bone);
+  }
+  .asset .a-sub { font-family: var(--mono); font-size:13px; color:var(--steel-2); letter-spacing:.15em; text-transform:uppercase; }
+  .asset .a-desc { font-family: var(--sans); font-weight: 300; font-size: 20px; line-height:1.5; color: var(--bone-3); }
+  .asset .a-stat {
+    margin-top: auto; display:flex; gap:32px; padding-top: 24px; border-top: 1px solid var(--line);
+  }
+  .asset .a-stat .s { display:flex; flex-direction:column; gap:4px; }
+  .asset .a-stat .l { font-family: var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color: var(--steel-2); }
+  .asset .a-stat .v { font-family: var(--mono); font-weight: 500; font-size: 28px; color: var(--bone); }
+
+  .asset.link { border-color: rgba(74,124,201,.4); }
+  .asset.link .ticker-tag { background: var(--link); color: white; }
+  .asset.link .a-name { color: #7AA3DD; }
+  .asset.dot { border-color: rgba(110,141,174,.4); }
+  .asset.dot .ticker-tag { background: var(--dot); color: white; }
+  .asset.dot .a-name { color: #9EB4CC; }
+  .asset.ita { border-color: rgba(90,133,217,.5); background: linear-gradient(180deg, rgba(46,91,186,.08), transparent); }
+  .asset.ita .ticker-tag { background: var(--accent); color: white; }
+  .asset.ita .a-name { color: var(--accent-2); }
+
+  /* Mission slide */
+  .mission { display:grid; grid-template-columns: 1.3fr 1fr; gap: 96px; margin-top: 56px; flex:1; }
+  .mission .lhs h3.title { font-size: 110px; }
+  .mission .lhs .quote {
+    margin-top: 56px; padding-left: 32px; border-left: 2px solid var(--accent);
+    font-family: var(--sans); font-weight: 300; font-style: italic; font-size: 32px; line-height:1.35; color: var(--bone-2);
+    max-width: 700px; letter-spacing: -0.015em;
+  }
+  .mission .rhs { display:flex; flex-direction:column; gap: 24px; }
+  .mission .pillar {
+    border: 1px solid var(--line); padding: 28px 32px; background: rgba(255,255,255,0.015);
+  }
+  .mission .pillar .head { display:flex; align-items:center; gap:16px; margin-bottom: 12px; }
+  .mission .pillar .num {
+    font-family: var(--mono); font-size: 13px; letter-spacing: .15em; color: var(--accent-2); font-weight: 500;
+  }
+  .mission .pillar h4 { font-family: var(--sans); font-weight: 600; font-size: 28px; color: var(--bone); letter-spacing: -0.02em; }
+  .mission .pillar p { font-family: var(--sans); font-weight: 300; font-size: 18px; line-height:1.55; color: var(--bone-3); }
+
+  /* Hitos */
+  .hitos { display:grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-top: 64px; flex:1; }
+  .hito {
+    padding: 32px 28px 32px 0; border-left: 1px solid var(--line); padding-left: 28px;
+    display:flex; flex-direction:column; gap: 16px;
+    position:relative;
+  }
+  .hito::before {
+    content:""; position:absolute; left: -1px; top:0; width: 1px; height: 48px; background: var(--accent);
+  }
+  .hito .step { font-family: var(--mono); font-size: 12px; letter-spacing: .22em; color: var(--accent); font-weight: 500; }
+  .hito h4 { font-family: var(--sans); font-weight: 600; font-size: 28px; line-height:1.15; color: var(--bone); letter-spacing: -0.02em; }
+  .hito p { font-family: var(--sans); font-weight: 300; font-size: 16px; line-height:1.55; color: var(--bone-3); }
+  .hito .icon {
+    width: 36px; height: 36px; border: 1px solid var(--bone-3); border-radius:2px;
+    display:grid; place-items:center; color: var(--bone-3);
+    margin-top: 8px;
+  }
+
+  /* Metrics table */
+  .table {
+    margin-top: 56px; width: 100%; border-collapse: collapse;
+    font-family: var(--sans);
+  }
+  .table th, .table td {
+    text-align: left; padding: 26px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .table thead th {
+    font-family: var(--mono); font-size: 13px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--steel-2); border-bottom: 1px solid var(--bone-3);
+    padding-bottom: 16px; padding-top: 16px;
+  }
+  .table tbody td:first-child {
+    font-family: var(--sans); font-weight: 500; font-size: 24px; color: var(--bone); letter-spacing: -0.015em;
+  }
+  .table tbody td {
+    font-family: var(--mono); font-weight: 500; font-size: 26px; color: var(--bone-2);
+    font-feature-settings:'tnum' 1;
+  }
+  .table tbody td.head-cell { font-family: var(--mono); font-size:12px; letter-spacing: .22em; color: var(--steel-2); text-transform: uppercase; }
+  .table .pos { color: #5A9FB0; }
+  .table .neg { color: #B07D6E; }
+  .table .strong { color: var(--accent-2); }
+  .table .ita-row td:first-child { color: var(--accent-2); }
+  .table .link-row td:first-child { color: #7AA3DD; }
+  .table .dot-row td:first-child { color: #9EB4CC; }
+
+  /* Bone-themed table */
+  section[data-theme="bone"] .table th, section[data-theme="bone"] .table td { border-bottom: 1px solid var(--line-bone); }
+  section[data-theme="bone"] .table thead th { color: var(--steel); border-bottom: 1px solid var(--ink); }
+  section[data-theme="bone"] .table tbody td:first-child { color: var(--ink); }
+  section[data-theme="bone"] .table tbody td { color: var(--steel); }
+  section[data-theme="bone"] .table tbody td.head-cell { color: var(--steel); }
+
+  .footnote {
+    margin-top: 28px; font-family: var(--mono); font-size: 14px; color: var(--steel-2);
+    padding-left: 16px; border-left: 2px solid var(--accent);
+  }
+
+  /* Sharpe focus slide */
+  .sharpe { display:grid; grid-template-columns: 1.1fr 1fr; gap: 96px; margin-top: 64px; flex:1; align-items:center; }
+  .sharpe .lhs .big { font-family: var(--sans); font-weight: 600; font-size: 72px; line-height:1.1; color: var(--ink); letter-spacing: -0.035em; }
+  .sharpe .lhs .big .ital { color: var(--accent-3); font-weight: 300; font-style: italic; }
+  .sharpe .lhs .big .steel { color: var(--accent-3); font-weight: 700; }
+  .sharpe .lhs .body { margin-top: 32px; font-family: var(--sans); font-weight: 300; font-size: 22px; line-height:1.55; color: var(--steel); max-width: 720px; }
+  .sharpe-bars { display:flex; flex-direction:column; gap: 24px; }
+  .sharpe-bar { display:grid; grid-template-columns: 120px 1fr 100px; align-items:center; gap: 24px; }
+  .sharpe-bar .lab { font-family: var(--mono); font-size:14px; letter-spacing:.18em; color: var(--steel); }
+  .sharpe-bar .track { height: 28px; background: var(--bone-2); position:relative; }
+  .sharpe-bar .fill { height:100%; }
+  .sharpe-bar.link .fill { background: var(--link); }
+  .sharpe-bar.dot  .fill { background: var(--dot); }
+  .sharpe-bar.ita  .fill { background: var(--accent-3); }
+  .sharpe-bar .val { font-family: var(--mono); font-weight: 500; font-size: 32px; color: var(--ink); text-align:right; }
+  .sharpe-bar.ita .val { color: var(--accent-3); font-weight: 700; }
+
+  /* MAE table & chart */
+  .mae-grid { display:grid; grid-template-columns: 1.3fr 1fr; gap: 96px; margin-top: 56px; flex:1; }
+  .mae-chart {
+    border-left: 1px solid var(--line);
+    padding: 24px 0 24px 48px;
+    display:flex; flex-direction:column; gap: 28px;
+  }
+  .mae-chart .ch-title { font-family: var(--mono); font-size: 13px; letter-spacing: .22em; text-transform:uppercase; color: var(--steel-2); }
+  .mae-chart h4 { font-family: var(--sans); font-weight: 500; font-size: 30px; color: var(--bone); letter-spacing: -0.02em; line-height: 1.25; }
+  .mae-row { display:grid; grid-template-columns: 80px 1fr 120px; gap: 16px; align-items:center; }
+  .mae-row .h { font-family: var(--mono); font-size: 14px; color: var(--steel-2); }
+  .mae-row .bar { height: 22px; background: rgba(255,255,255,0.05); position:relative; }
+  .mae-row .bar .f { height:100%; background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-3)); }
+  .mae-row .v { font-family: var(--mono); font-weight: 500; font-size: 22px; color: var(--bone); text-align:right; }
+
+  .mae-table { width:100%; border-collapse: collapse; }
+  .mae-table th, .mae-table td { padding: 22px 16px; text-align:left; border-bottom: 1px solid var(--line); }
+  .mae-table thead th { font-family: var(--mono); font-size: 12px; letter-spacing: .22em; text-transform:uppercase; color: var(--steel-2); }
+  .mae-table tbody td { font-family: var(--mono); font-weight: 500; font-size: 24px; color: var(--bone); }
+  .mae-table tbody td.h { font-family: var(--sans); font-weight: 500; font-size: 18px; color: var(--bone-2); }
+  .mae-table tbody td.stars { letter-spacing: 4px; font-family:var(--sans); }
+  .mae-table .s5 { color: var(--accent-2); }
+  .mae-table .s4 { color: #7AA3DD; }
+  .mae-table .s3 { color: var(--steel-blue-2); }
+  .mae-table .s2 { color: #8B9AAC; }
+
+  .mae-why {
+    margin-top: 40px; display: grid; grid-template-columns: repeat(3,1fr); gap: 24px;
+  }
+  .mae-why .why { padding: 24px; border: 1px solid var(--line); }
+  .mae-why .why .n { font-family: var(--sans); font-weight: 200; font-size: 48px; color: var(--accent-2); line-height:1; letter-spacing: -0.04em; }
+  .mae-why .why h5 { font-family: var(--sans); font-weight: 600; font-size: 20px; color: var(--bone); margin-top: 8px; letter-spacing: -0.015em; }
+  .mae-why .why p { font-family: var(--sans); font-weight:300; font-size: 16px; color: var(--bone-3); margin-top:8px; line-height:1.5; }
+
+  /* Profiles */
+  .profiles { display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 56px; flex:1; }
+  .profile {
+    padding: 40px; border: 1px solid var(--line); position:relative;
+    display:flex; flex-direction:column; gap: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+  }
+  .profile .pct { font-family: var(--sans); font-weight: 700; font-size: 110px; line-height:.9; color: var(--bone); letter-spacing:-.05em; }
+  .profile .pct .small { font-size: 50px; color: var(--bone-3); font-weight: 300; }
+  .profile .tag-row { display:flex; gap:8px; align-items:center; }
+  .profile .tag {
+    font-family: var(--mono); font-size: 11px; letter-spacing:.22em; text-transform:uppercase;
+    padding: 6px 10px; color: var(--ink);
+  }
+  .profile .name { font-family: var(--sans); font-weight: 600; font-size: 38px; line-height:1.05; color: var(--bone); letter-spacing: -0.025em; }
+  .profile .count { font-family: var(--mono); font-size: 14px; color: var(--steel-2); letter-spacing:.18em; text-transform:uppercase; }
+  .profile .desc { font-family: var(--sans); font-weight: 300; font-size: 18px; line-height:1.55; color: var(--bone-3); margin-top:8px; }
+  .profile .meta { margin-top:auto; padding-top: 24px; border-top: 1px solid var(--line); display:flex; gap: 24px; font-family: var(--mono); font-size:12px; color: var(--steel-2); letter-spacing:.18em; text-transform:uppercase; }
+  .profile .meta b { color: var(--bone); font-weight:500; }
+  .profile.hype { border-color: rgba(74,124,201,.4); }
+  .profile.hype .tag { background: var(--link); color: white; }
+  .profile.hype .pct { color: #7AA3DD; }
+  .profile.hyb { border-color: rgba(90,133,217,.5); background: linear-gradient(180deg, rgba(46,91,186,.06), transparent); }
+  .profile.hyb .tag { background: var(--accent); color: white; }
+  .profile.hyb .pct { color: var(--accent-2); }
+  .profile.cons { border-color: rgba(110,141,174,.4); }
+  .profile.cons .tag { background: var(--steel-blue); color: white; }
+  .profile.cons .pct { color: var(--steel-blue-2); }
+
+  /* Allocations */
+  .alloc-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 96px; margin-top: 64px; flex:1; align-items:center; }
+  .alloc-list { display:flex; flex-direction:column; gap: 36px; }
+  .alloc-row { display:flex; flex-direction:column; gap: 12px; }
+  .alloc-row .head { display:flex; justify-content:space-between; align-items:baseline; }
+  .alloc-row .name { font-family: var(--sans); font-weight: 600; font-size: 28px; color: var(--ink); letter-spacing: -0.02em; }
+  .alloc-row .pcts { display:flex; gap: 24px; font-family: var(--mono); font-size:14px; color: var(--steel-2); }
+  .alloc-row .pcts span b { color: var(--bone); font-weight:500; font-size:16px; }
+  .alloc-row .stack { display:flex; height: 36px; }
+  .alloc-row .seg { display:grid; place-items:center; font-family: var(--mono); font-size:13px; color: white; letter-spacing:.1em; }
+  .alloc-row .seg.link { background: var(--link); }
+  .alloc-row .seg.dot  { background: var(--dot); }
+  .alloc-row .seg.ita  { background: var(--accent-3); }
+
+  .alloc-quote {
+    border-left: 2px solid var(--accent); padding: 16px 0 16px 32px;
+    font-family: var(--sans); font-weight: 300; font-size: 28px; font-style: italic; line-height:1.4; color: var(--ink); letter-spacing: -0.015em;
+  }
+  .alloc-quote b { color: var(--accent-3); font-style: normal; font-weight: 700; }
+
+  /* Conclusions */
+  .concl { display:grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 56px; flex:1; }
+  .concl .col {
+    padding: 48px; border: 1px solid var(--line); position:relative;
+    background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    display:flex; flex-direction:column; gap: 20px;
+  }
+  .concl .col .lab { font-family: var(--mono); font-size: 12px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500; }
+  .concl .col h4 { font-family: var(--sans); font-weight: 600; font-size: 48px; line-height:1.1; color: var(--bone); letter-spacing: -0.035em; }
+  .concl .col p { font-family: var(--sans); font-weight: 300; font-size: 22px; line-height:1.55; color: var(--bone-2); }
+  .concl-quote {
+    grid-column: 1 / -1; margin-top: 24px;
+    font-family: var(--sans); font-weight: 300; font-style: italic; font-size: 44px; line-height:1.25; color: var(--bone); letter-spacing: -0.025em;
+    padding: 32px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    text-align:center;
+  }
+  .concl-quote b { color: var(--accent-2); font-weight: 600; font-style: normal; }
+
+  /* Closing slide */
+  .closing { background: var(--ink); }
+  .closing .grid-bg {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(242,237,228,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(242,237,228,.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(80% 80% at 50% 50%, black 30%, transparent 90%);
+  }
+  .closing .body { position:absolute; left:96px; right:96px; top:240px; bottom:160px; display:flex; flex-direction:column; justify-content:center; }
+  .closing h1 { font-family: var(--sans); font-weight: 700; font-size: 280px; line-height:.9; letter-spacing:-.06em; color: var(--bone); }
+  .closing h1 .ital { color: var(--accent-2); font-weight: 200; font-style: italic; letter-spacing: -0.05em; }
+  .closing .sub { font-family: var(--sans); font-weight: 300; font-size: 30px; color: var(--bone-3); margin-top: 32px; max-width: 1100px; line-height:1.4; letter-spacing: -0.015em; }
+  .closing .team-row {
+    margin-top: 80px; display:flex; gap: 64px; align-items:center; padding-top: 32px; border-top: 1px solid var(--line);
+  }
+  .closing .team-row .n { font-family: var(--sans); font-weight: 500; font-size: 22px; color: var(--bone); letter-spacing: -0.015em; }
+  .closing .team-row .label { font-family: var(--mono); font-size:12px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase; }
+  .closing .next {
+    position:absolute; right: 96px; bottom: 160px;
+    display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+  }
+  .closing .next .lab { font-family: var(--mono); font-size: 12px; letter-spacing:.22em; color: var(--accent-2); text-transform: uppercase; font-weight: 500; }
+  .closing .next .v { font-family: var(--sans); font-weight: 300; font-style: italic; font-size: 30px; color: var(--bone); letter-spacing: -0.02em; }
+
+  /* Agenda */
+  .agenda { display:flex; flex-direction:column; gap:0; margin-top: 56px; flex:1; justify-content:center; }
+  .agenda .row {
+    display:grid; grid-template-columns: 80px 1.1fr 1fr 180px; gap: 40px; align-items:center;
+    padding: 22px 0; border-bottom: 1px solid var(--line-bone);
+  }
+  section[data-theme="bone"] .agenda .row { border-bottom-color: var(--line-bone); }
+  .agenda .row:first-child { border-top: 1px solid var(--line-bone); }
+  .agenda .num {
+    font-family: var(--mono); font-weight: 400; font-size: 24px; color: var(--accent); letter-spacing: 0;
+  }
+  .agenda .name { font-family: var(--sans); font-weight: 600; font-size: 34px; color: var(--ink); line-height:1.05; letter-spacing: -0.025em; }
+  .agenda .desc { font-family: var(--sans); font-weight: 300; font-size: 16px; color: var(--steel); max-width: 460px; line-height:1.5; }
+  .agenda .person { font-family: var(--mono); font-size: 11px; letter-spacing:.22em; text-transform:uppercase; color: var(--steel-2); text-align:right; font-weight: 500; }
+  .agenda .person b { display:block; color: var(--ink); font-family: var(--sans); font-weight: 500; font-size: 16px; letter-spacing:-0.015em; text-transform:none; margin-bottom: 4px; }
+
+  /* ==========================================================
+     ANIMATION SYSTEM — professional, subtle, fast
+     Elements animate in when their slide becomes [data-active].
+     ========================================================== */
+
+  /* Slide-level enter: cinematic reveal — a thin accent line sweeps
+     across, content scales in subtly. No heavy curtain. */
+  section[data-slide] { opacity: 1; }
+  section[data-slide]::after {
+    content: "";
+    position: absolute; left: 0; right: 0; top: 50%;
+    height: 2px; transform: scaleX(0); transform-origin: left center;
+    background: linear-gradient(90deg, transparent, var(--accent-2) 20%, var(--accent) 50%, var(--accent-2) 80%, transparent);
+    box-shadow: 0 0 24px rgba(90,133,217,.6), 0 0 60px rgba(46,91,186,.35);
+    pointer-events: none;
+    z-index: 50;
+  }
+  section[data-slide][data-active]::after {
+    animation: sweepLine 720ms cubic-bezier(.65,0,.35,1) forwards;
+  }
+  @keyframes sweepLine {
+    0%   { transform-origin: left center;  transform: scaleX(0); }
+    50%  { transform-origin: left center;  transform: scaleX(1); }
+    51%  { transform-origin: right center; transform: scaleX(1); }
+    100% { transform-origin: right center; transform: scaleX(0); }
+  }
+
+  /* Content gets a soft scale-in over the slide swap */
+  section[data-slide] > *:not(.grain):not(.vignette):not(.grid-bg) {
+    opacity: 0; transform: scale(.985);
+    transition: opacity 520ms cubic-bezier(.2,.7,.2,1), transform 520ms cubic-bezier(.2,.7,.2,1);
+  }
+  section[data-slide][data-active] > *:not(.grain):not(.vignette):not(.grid-bg) {
+    opacity: 1; transform: none;
+  }
+
+  /* Cinematic "Ken Burns" pan on cover/closing background grid */
+  .cover .grid-bg, .closing .grid-bg {
+    transform: scale(1.0); transition: transform 14s linear, opacity 1.2s ease;
+    opacity: .55;
+  }
+  section[data-active].cover .grid-bg,
+  section[data-active].closing .grid-bg { transform: scale(1.08); opacity: .9; }
+
+  /* Reveal primitive — opacity + small Y translate, controlled by --d */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms cubic-bezier(.2,.7,.2,1),
+      transform 700ms cubic-bezier(.2,.7,.2,1);
+    transition-delay: var(--d, 0ms);
+    will-change: opacity, transform, filter;
+  }
+  section[data-active] [data-reveal] {
+    opacity: 1; transform: none;
+  }
+  /* Reveals start sooner now that there's no heavy curtain */
+  section[data-active] [data-reveal] {
+    transition-delay: calc(var(--d, 0ms) + 220ms);
+  }
+
+  /* Variants */
+  [data-reveal="left"]  { transform: translateX(-22px); }
+  [data-reveal="right"] { transform: translateX(22px); }
+  [data-reveal="up"]    { transform: translateY(22px); }
+  [data-reveal="down"]  { transform: translateY(-14px); }
+  [data-reveal="scale"] { transform: scale(.94); }
+  [data-reveal="rule"]  { transform: scaleX(0); transform-origin: left center; filter: none; }
+  section[data-active] [data-reveal="rule"] { transform: scaleX(1); }
+
+  /* Counter — increments via JS, hidden until active */
+  [data-count] { font-variant-numeric: tabular-nums; }
+
+  /* Bar fills */
+  [data-bar] { transform: scaleX(0); transform-origin: left center;
+    transition: transform 1100ms cubic-bezier(.2,.7,.2,1);
+    transition-delay: var(--d, 0ms); }
+  section[data-active] [data-bar] { transform: scaleX(1); }
+
+  /* Pie/donut conic-gradient pulse */
+  [data-donut] { filter: saturate(.4) brightness(.9); transition: filter 900ms ease; transition-delay: var(--d, 200ms); }
+  section[data-active] [data-donut] { filter: saturate(1) brightness(1); }
+
+  /* (caret + pulsing dot removed per design feedback) */
+  .blink, .live-dot { display: none !important; animation: none !important; }
+
+  /* Slide progress bar (top) */
+  .deck-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    z-index: 9999; transition: width 400ms ease;
+    box-shadow: 0 0 12px rgba(90,133,217,.6);
+  }
+
+  /* Hover micro-interactions on interactive cards */
+  .agenda .row, .person, .a-card, .profile, .alloc-card, .col, .pillar, .hito, .metric-row {
+    transition: transform 220ms ease, background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
+  .agenda .row:hover, .a-card:hover, .profile:hover, .alloc-card:hover, .col:hover, .pillar:hover, .hito:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    section[data-slide], [data-reveal], [data-bar], [data-donut],
+    .cover .grid-bg, .closing .grid-bg {
+      transition: none !important; animation: none !important;
+      transform: none !important; opacity: 1 !important; filter: none !important;
+    }
+    .blink, .live-dot { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<deck-stage>
+
+<!-- ============================================== -->
+<!-- SLIDE 1 — COVER                                -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="01 Portada" class="cover">
+  <div class="grid-bg"></div>
+  <div class="grain"></div>
+
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Fase 02 · Mayo 2026</div>
+  </div>
+
+  <div class="body">
+    <div>
+      <div class="eyebrow" data-reveal style="margin-bottom: 32px;">Proyecto de Ingeniería · M11 · Grupo 01</div>
+      <h1 data-reveal="up">
+        Iron<span class="ital" style="letter-spacing: 0px">Clad</span><br/>
+        Capital
+      </h1>
+      <div data-reveal style="margin-top: 40px; font-family: var(--sans); font-weight: 300; font-size: 32px; color: var(--bone-3); max-width: 900px; line-height:1.3; letter-spacing:-0.02em;">
+        Los datos no mienten,<br/>
+        <span style="color: var(--accent-2); font-weight: 400;">las emociones sí.</span>
+      </div>
+    </div>
+    <div class="meta" data-reveal="left">
+      <div class="row">
+        <div class="label">Fase</div>
+        <div class="val italic">Ejecución y Resultados</div>
+      </div>
+      <div class="row">
+        <div class="label">Institución</div>
+        <div class="val">Universidad Europea de Madrid</div>
+      </div>
+      <div class="row">
+        <div class="label">Equipo</div>
+        <div class="val" style="font-size: 22px; line-height:1.6;">
+          José Pablo Aceves<br/>
+          Ignacio del Peso<br/>
+          Adrián Duque
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker">
+    <span class="tk"><span class="sym">LINK-USD</span> <span class="v">14.82</span> <span class="up">+187.4%</span></span>
+    <span class="sep">/</span>
+    <span class="tk"><span class="sym">DOT-USD</span> <span class="v">7.34</span> <span class="up">+134.0%</span></span>
+    <span class="sep">/</span>
+    <span class="tk"><span class="sym">ITA</span> <span class="v">182.04</span> <span class="up">+62.0%</span></span>
+    <span class="sep">/</span>
+    <span class="tk"><span class="sym">VOL · LINK</span> <span class="v">82%</span></span>
+    <span class="sep">/</span>
+    <span class="tk"><span class="sym">SHARPE · ITA</span> <span class="v">1.43</span></span>
+    <span class="sep">/</span>
+    <span class="tk"><span class="sym">CORR LINK·ITA</span> <span class="v">−0.08</span></span>
+    <span class="sep">/</span>
+    <span class="tk"><span class="sym">N · CLIENTES</span> <span class="v">12,000</span></span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 2 — AGENDA                               -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="02 Agenda" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Agenda</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">Programa de la sesión · 10 minutos</div>
+    <h3 class="title" style="margin-top: 16px;">Cuatro <span class="ital">bloques</span>,<br/>un mismo principio.</h3>
+
+    <div class="agenda">
+      <div class="row" data-reveal="left">
+        <div class="num">01</div>
+        <div>
+          <div class="name">Contexto y Objetivos</div>
+        </div>
+        <div class="desc">Misión, motor tecnológico, hitos y los tres activos seleccionados.</div>
+        <div class="person"></div>
+      </div>
+      <div class="row" data-reveal="left">
+        <div class="num">02</div>
+        <div>
+          <div class="name">Análisis Financiero</div>
+        </div>
+        <div class="desc">Métricas de riesgo-retorno 2023–26 y eficiencia ajustada por Sharpe.</div>
+        <div class="person"></div>
+      </div>
+      <div class="row" data-reveal="left">
+        <div class="num">03</div>
+        <div>
+          <div class="name">Predicciones y Error MAE</div>
+        </div>
+        <div class="desc">Modelo WMA + regresión lineal. Fiabilidad por horizonte y honestidad del error.</div>
+        <div class="person"></div>
+      </div>
+      <div class="row" data-reveal="left">
+        <div class="num">04</div>
+        <div>
+          <div class="name">Segmentación y Perfiles</div>
+        </div>
+        <div class="desc">12.000 registros de Kaggle, tres arquetipos y carteras a medida.</div>
+        <div class="person"></div>
+      </div>
+      <div class="row" data-reveal="left">
+        <div class="num">05</div>
+        <div>
+          <div class="name">Conclusiones y Cierre</div>
+        </div>
+        <div class="desc">Validación técnica, oportunidad de mercado y siguiente fase.</div>
+        <div class="person"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IRONCLAD CAPITAL · FASE 2</span>
+    <span class="num">02 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 3 — DIVIDER 01                            -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="03 Bloque 01" class="divider">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Bloque 01</div>
+  </div>
+
+  <div class="num" data-reveal="scale">01</div>
+  <div class="body">
+    <div class="tag" data-reveal>Apertura</div>
+    <h2 data-reveal="up">Contexto y<br/><span class="ital">objetivos.</span></h2>
+    <div class="lede" data-reveal>Una plataforma financiera que reúne activos digitales e instrumentos tradicionales, con un solo principio editorial: mostrar los datos tal como son.</div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2</span>
+    <span class="num">03 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 4 — MISSION                              -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="04 Mision">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">01 · Misión</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">Plataforma democrática</div>
+
+    <div class="mission">
+      <div class="lhs" data-reveal="left">
+        <h3 class="title">Misión y motor<br/><span class="ital">tecnológico.</span></h3>
+        <div class="quote">«Reunimos activos digitales e instrumentos tradicionales para facilitar la comprensión de carteras mixtas.»</div>
+      </div>
+      <div class="rhs">
+        <div class="pillar" data-reveal="right">
+          <div class="head">
+            <div class="num">01</div>
+            <h4>Python &amp; <span class="ital">yfinance</span></h4>
+          </div>
+          <p>Motor de datos en tiempo real conectado directamente a Yahoo Finance. Sin preprocesado manual, sin intermediarios. Pipeline reproducible de extremo a extremo.</p>
+        </div>
+        <div class="pillar" data-reveal="right">
+          <div class="head">
+            <div class="num">02</div>
+            <h4>Análisis <span class="ital">objetivo</span></h4>
+          </div>
+          <p>Decisiones basadas en datos históricos, no en emociones. Métricas auditables, modelos transparentes y carteras justificadas por evidencia cuantitativa.</p>
+        </div>
+        <div class="pillar" data-reveal="right">
+          <div class="head">
+            <div class="num">03</div>
+            <h4>Carteras <span class="ital">mixtas</span></h4>
+          </div>
+          <p>Cripto y ETF en la misma vista. Tres perfiles riesgo-retorno cubiertos. Diversificación real con correlaciones medidas, no asumidas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Misión</span>
+    <span class="num">04 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 5 — MARCO CONCEPTUAL · HOMBRE ANUMÉRICO  -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="05 Marco Conceptual" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Marco conceptual · Fase 3</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">El hombre anumérico · Paulos</div>
+    <h3 class="title" style="margin-top: 12px;">No es matemática.<br/>Es <span class="ital">cómo leemos los datos.</span></h3>
+
+    <div style="display:grid; grid-template-columns: 1.05fr 1fr; gap: 80px; margin-top: 56px; flex:1; align-items:start;">
+      <div data-reveal="left">
+        <div style="font-family: var(--mono); font-size: 13px; letter-spacing:.22em; text-transform:uppercase; color: var(--steel); margin-bottom: 24px;">Tendencias cognitivas concretas</div>
+        <div style="display:flex; flex-direction:column;">
+          <div style="display:grid; grid-template-columns: 48px 1fr; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line-bone);">
+            <div style="font-family: var(--mono); font-size: 14px; color: var(--accent); padding-top: 4px; letter-spacing: .1em;">01</div>
+            <div style="font-family: var(--sans); font-weight: 500; font-size: 26px; color: var(--ink); letter-spacing: -0.02em; line-height: 1.3;">Confundir correlación con causalidad.</div>
+          </div>
+          <div style="display:grid; grid-template-columns: 48px 1fr; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line-bone);">
+            <div style="font-family: var(--mono); font-size: 14px; color: var(--accent); padding-top: 4px; letter-spacing: .1em;">02</div>
+            <div style="font-family: var(--sans); font-weight: 500; font-size: 26px; color: var(--ink); letter-spacing: -0.02em; line-height: 1.3;">Confiar excesivamente en predicciones numéricas.</div>
+          </div>
+          <div style="display:grid; grid-template-columns: 48px 1fr; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line-bone);">
+            <div style="font-family: var(--mono); font-size: 14px; color: var(--accent); padding-top: 4px; letter-spacing: .1em;">03</div>
+            <div style="font-family: var(--sans); font-weight: 500; font-size: 26px; color: var(--ink); letter-spacing: -0.02em; line-height: 1.3;">Ignorar la incertidumbre intrínseca de los modelos.</div>
+          </div>
+          <div style="display:grid; grid-template-columns: 48px 1fr; gap: 24px; padding: 22px 0;">
+            <div style="font-family: var(--mono); font-size: 14px; color: var(--accent); padding-top: 4px; letter-spacing: .1em;">04</div>
+            <div style="font-family: var(--sans); font-weight: 500; font-size: 26px; color: var(--ink); letter-spacing: -0.02em; line-height: 1.3;">Aceptar gráficos o porcentajes sin contexto.</div>
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal="right" style="display:flex; flex-direction:column; gap: 32px;">
+        <div style="padding: 36px; border: 1px solid var(--line-bone); background: rgba(46,91,186,.04);">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent); text-transform:uppercase; font-weight: 500; margin-bottom: 16px;">Por qué importa en finanzas</div>
+          <p style="font-family: var(--sans); font-weight: 300; font-size: 22px; line-height: 1.5; color: var(--ink); letter-spacing: -0.015em;">Un modelo predictivo puede mostrar buenos resultados históricos y aun así fallar ante cambios del entorno real. Un gráfico puede transmitir precisión que no refleja la complejidad de los datos.</p>
+        </div>
+        <div style="border-left: 2px solid var(--accent); padding: 8px 0 8px 32px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase; margin-bottom: 12px;">Cómo lo aplica IronClad</div>
+          <p style="font-family: var(--sans); font-weight: 300; font-size: 24px; line-height: 1.45; color: var(--ink); letter-spacing: -0.02em;">Los resultados no se presentan como certezas absolutas, sino como <b style="color: var(--accent-3); font-weight: 700;">estimaciones sujetas a limitaciones, márgenes de error y posibles sesgos.</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Marco conceptual</span>
+    <span class="num">05 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 6 — HITOS                                 -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="05 Hitos" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">01 · Hitos</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">Hitos de la Fase 2</div>
+    <h3 class="title" style="margin-top:12px;">Cinco etapas. <span class="ital">Un sistema validado.</span></h3>
+
+    <div class="hitos">
+      <div class="hito" data-reveal="up">
+        <div class="step">01 · Datos</div>
+        <h4>Procesamiento de Datos</h4>
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+        </div>
+        <p style="color: var(--steel);">Descarga, limpieza y normalización de LINK-USD, DOT-USD e ITA desde 2023.</p>
+      </div>
+      <div class="hito" data-reveal="up">
+        <div class="step">02 · Visualización</div>
+        <h4>Visualización Avanzada</h4>
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-7"/></svg>
+        </div>
+        <p style="color: var(--steel);">Rendimientos acumulados y comparativa de volatilidad anualizada por activo.</p>
+      </div>
+      <div class="hito" data-reveal="up">
+        <div class="step">03 · Modelo</div>
+        <h4>Modelado Predictivo</h4>
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+        <p style="color: var(--steel);">Construcción de modelos WMA + regresión lineal y evaluación mediante MAE.</p>
+      </div>
+      <div class="hito" data-reveal="up">
+        <div class="step">04 · Segmentación</div>
+        <h4>Segmentación Real</h4>
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="11" r="3"/><circle cx="11" cy="17" r="3"/></svg>
+        </div>
+        <p style="color: var(--steel);">Análisis de 12.000 registros del dataset Finance Trends &amp; Behaviour de Kaggle.</p>
+      </div>
+      <div class="hito" data-reveal="up">
+        <div class="step">05 · Validación</div>
+        <h4>Validación del Sistema</h4>
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+        </div>
+        <p style="color: var(--steel);">Funcionamiento comprobado de extremo a extremo con datos reales de mercado.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Hitos</span>
+    <span class="num">06 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 6 — ASSETS                                -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="06 Activos">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">01 · Activos</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">Universo analizado</div>
+    <h3 class="title" style="margin-top:12px;">Tres activos, tres <span class="ital">perfiles de riesgo.</span></h3>
+
+    <div class="asset-grid">
+      <div class="asset link" data-reveal="up">
+        <div class="ticker-tag">LINK-USD</div>
+        <div>
+          <div class="a-sub">Chainlink · Oracle</div>
+          <div class="a-name">Chain<span class="ital">link</span></div>
+        </div>
+        <div class="a-desc">Protocolo oracle de DeFi. Alta volatilidad con alto potencial de retorno en el ecosistema descentralizado.</div>
+        <div class="a-stat">
+          <div class="s"><div class="l">Retorno</div><div class="v">+187%</div></div>
+          <div class="s"><div class="l">Volatilidad</div><div class="v">~82%</div></div>
+        </div>
+      </div>
+      <div class="asset dot" data-reveal="up">
+        <div class="ticker-tag">DOT-USD</div>
+        <div>
+          <div class="a-sub">Polkadot · Layer 0</div>
+          <div class="a-name">Polka<span class="ital">dot</span></div>
+        </div>
+        <div class="a-desc">Interoperabilidad blockchain. Ecosistema técnico sólido y consolidado, con perfil de volatilidad menor que LINK.</div>
+        <div class="a-stat">
+          <div class="s"><div class="l">Retorno</div><div class="v">+134%</div></div>
+          <div class="s"><div class="l">Volatilidad</div><div class="v">~75%</div></div>
+        </div>
+      </div>
+      <div class="asset ita" data-reveal="up">
+        <div class="ticker-tag">ITA · ETF</div>
+        <div>
+          <div class="a-sub">iShares · U.S. Aerospace &amp; Defense</div>
+          <div class="a-name">iShares<br/><span class="ital">Defense</span></div>
+        </div>
+        <div class="a-desc">Sector defensa de EE.UU. El ancla de estabilidad institucional para la cartera diversificada.</div>
+        <div class="a-stat">
+          <div class="s"><div class="l">Retorno</div><div class="v">+62%</div></div>
+          <div class="s"><div class="l">Volatilidad</div><div class="v">~18%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Activos</span>
+    <span class="num">07 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 8 — UML · CASOS DE USO                    -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="08 UML Casos de Uso" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">01 · Modelo UML</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">Diagrama de casos de uso · 13 casos · 4 actores · 5 paquetes</div>
+    <h3 class="title" style="margin-top: 12px;">Contrato funcional <span class="ital">del sistema.</span></h3>
+
+    <div style="margin-top: 36px; display: grid; grid-template-columns: 200px 1fr 200px; gap: 28px; flex: 1; align-items: stretch;">
+
+      <!-- LEFT actor: Analista Financiero -->
+      <div data-reveal="left" style="display:flex; flex-direction:column; justify-content: center; align-items: center; gap: 16px; border: 1px solid var(--ink); padding: 28px 16px; background: rgba(46,91,186,.06);">
+        <div style="font-family: var(--mono); font-size: 10px; letter-spacing:.22em; color: var(--accent); text-transform:uppercase; font-weight: 600;">Actor · Principal</div>
+        <svg width="56" height="80" viewBox="0 0 56 80" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"><circle cx="28" cy="14" r="10"/><line x1="28" y1="24" x2="28" y2="52"/><line x1="12" y1="36" x2="44" y2="36"/><line x1="28" y1="52" x2="14" y2="76"/><line x1="28" y1="52" x2="42" y2="76"/></svg>
+        <div style="text-align:center;">
+          <div style="font-family: var(--sans); font-weight: 600; font-size: 20px; color: var(--ink); letter-spacing: -0.02em; line-height: 1.15;">Analista<br/>Financiero</div>
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.15em; color: var(--steel); margin-top: 10px; text-transform: uppercase;">Interno · «principal»</div>
+        </div>
+      </div>
+
+      <!-- CENTER: 5 packages -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+        <!-- GESTIÓN DE DATOS -->
+        <div data-reveal="up" style="border: 1.5px solid var(--link); padding: 16px 18px; background: rgba(74,124,201,.06); display:flex; flex-direction:column; gap: 10px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing:.22em; color: var(--link); text-transform:uppercase; font-weight: 700;">Gestión de datos</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--steel); letter-spacing: .1em;">2 UC</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap: 6px;">
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(74,124,201,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--link);">UC1</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Descargar datos</span></div>
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(74,124,201,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--link);">UC2</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Limpiar y preparar</span></div>
+          </div>
+        </div>
+
+        <!-- SEGMENTACIÓN -->
+        <div data-reveal="up" style="border: 1.5px solid var(--accent); padding: 16px 18px; background: rgba(46,91,186,.06); display:flex; flex-direction:column; gap: 10px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing:.22em; color: var(--accent); text-transform:uppercase; font-weight: 700;">Segmentación</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--steel); letter-spacing: .1em;">2 UC</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap: 6px;">
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(46,91,186,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--accent);">UC7</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Segmentar clientes</span></div>
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(46,91,186,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--accent);">UC8</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Definir perfiles (≥3)</span></div>
+          </div>
+        </div>
+
+        <!-- ANÁLISIS -->
+        <div data-reveal="up" style="border: 1.5px solid var(--steel-blue); padding: 16px 18px; background: rgba(58,95,143,.07); display:flex; flex-direction:column; gap: 10px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing:.22em; color: var(--steel-blue); text-transform:uppercase; font-weight: 700;">Análisis</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--steel); letter-spacing: .1em;">4 UC</div>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div style="display:flex; align-items:center; gap: 8px; padding: 7px 10px; background: var(--bone); border: 1px solid rgba(58,95,143,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 10px; color: var(--steel-blue);">UC3</span><span style="font-family: var(--sans); font-size: 11px; color: var(--ink); letter-spacing: -0.005em;">Evolución</span></div>
+            <div style="display:flex; align-items:center; gap: 8px; padding: 7px 10px; background: var(--bone); border: 1px solid rgba(58,95,143,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 10px; color: var(--steel-blue);">UC4</span><span style="font-family: var(--sans); font-size: 11px; color: var(--ink); letter-spacing: -0.005em;">Rend./vol.</span></div>
+            <div style="display:flex; align-items:center; gap: 8px; padding: 7px 10px; background: var(--bone); border: 1px solid rgba(58,95,143,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 10px; color: var(--steel-blue);">UC5</span><span style="font-family: var(--sans); font-size: 11px; color: var(--ink); letter-spacing: -0.005em;">Comparar</span></div>
+            <div style="display:flex; align-items:center; gap: 8px; padding: 7px 10px; background: var(--bone); border: 1px solid rgba(58,95,143,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 10px; color: var(--steel-blue);">UC6</span><span style="font-family: var(--sans); font-size: 11px; color: var(--ink); letter-spacing: -0.005em;">Visualizar</span></div>
+          </div>
+        </div>
+
+        <!-- COMUNICACIÓN -->
+        <div data-reveal="up" style="border: 1.5px solid var(--dot); padding: 16px 18px; background: rgba(110,141,174,.10); display:flex; flex-direction:column; gap: 10px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing:.22em; color: var(--dot); text-transform:uppercase; font-weight: 700;">Comunicación</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--steel); letter-spacing: .1em;">2 UC</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap: 6px;">
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(110,141,174,.5); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--dot);">UC9</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Redactar informe</span></div>
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(110,141,174,.5); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--dot);">UC10</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Publicar blog</span></div>
+          </div>
+        </div>
+
+        <!-- ACCESO CLIENTE -->
+        <div data-reveal="up" style="grid-column: 1 / -1; border: 1.5px solid var(--accent-3); padding: 16px 18px; background: rgba(26,61,133,.06); display:flex; flex-direction:column; gap: 10px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing:.22em; color: var(--accent-3); text-transform:uppercase; font-weight: 700;">Acceso cliente</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--steel); letter-spacing: .1em;">3 UC</div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(26,61,133,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--accent-3);">UC11</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Consultar análisis</span></div>
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(26,61,133,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--accent-3);">UC12</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Leer blog</span></div>
+            <div style="display:flex; align-items:center; gap: 10px; padding: 8px 14px; background: var(--bone); border: 1px solid rgba(26,61,133,.45); border-radius: 100px;"><span style="font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--accent-3);">UC13</span><span style="font-family: var(--sans); font-size: 13px; color: var(--ink); letter-spacing: -0.01em;">Solicitar informe</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT actor: Cliente / Usuario -->
+      <div data-reveal="right" style="display:flex; flex-direction:column; justify-content: center; align-items: center; gap: 16px; border: 1px solid var(--ink); padding: 28px 16px; background: rgba(26,61,133,.05);">
+        <div style="font-family: var(--mono); font-size: 10px; letter-spacing:.22em; color: var(--accent-3); text-transform:uppercase; font-weight: 600;">Actor · Principal</div>
+        <svg width="56" height="80" viewBox="0 0 56 80" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"><circle cx="28" cy="14" r="10"/><line x1="28" y1="24" x2="28" y2="52"/><line x1="12" y1="36" x2="44" y2="36"/><line x1="28" y1="52" x2="14" y2="76"/><line x1="28" y1="52" x2="42" y2="76"/></svg>
+        <div style="text-align:center;">
+          <div style="font-family: var(--sans); font-weight: 600; font-size: 20px; color: var(--ink); letter-spacing: -0.02em; line-height: 1.15;">Cliente /<br/>Usuario</div>
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.15em; color: var(--steel); margin-top: 10px; text-transform: uppercase;">Final · «principal»</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- External actors footer -->
+    <div style="margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line-bone); display: grid; grid-template-columns: 200px 1fr 1fr; gap: 28px; align-items: center;">
+      <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase;">Actores externos</div>
+      <div data-reveal style="display:flex; align-items: center; gap: 14px;">
+        <div style="width: 10px; height: 10px; border: 1.5px solid var(--steel); border-radius: 50%;"></div>
+        <div>
+          <div style="font-family: var(--sans); font-weight: 600; font-size: 17px; color: var(--ink); letter-spacing: -0.015em;">Sistema yfinance</div>
+          <div style="font-family: var(--mono); font-size: 11px; color: var(--steel); letter-spacing: .05em;">Fuente de datos · alimenta UC1</div>
+        </div>
+      </div>
+      <div data-reveal style="display:flex; align-items: center; gap: 14px;">
+        <div style="width: 10px; height: 10px; border: 1.5px solid var(--steel); border-radius: 50%;"></div>
+        <div>
+          <div style="font-family: var(--sans); font-weight: 600; font-size: 17px; color: var(--ink); letter-spacing: -0.015em;">Plataforma Web</div>
+          <div style="font-family: var(--mono); font-size: 11px; color: var(--steel); letter-spacing: .05em;">Capa pública · sirve UC9–UC13</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · UML</span>
+    <span class="num">08 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 9 — PLANIFICACIÓN Y FASES                 -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="08 Planificacion">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">01 · Planificación</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">Cronograma · Feb 2026 — May 2026</div>
+    <h3 class="title" style="margin-top: 12px;">Tres fases. <span class="ital">Tres roles rotados.</span></h3>
+
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 56px;">
+      <div data-reveal="up" style="border: 1px solid var(--line); padding: 36px; position:relative;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 24px;">
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: .22em; color: var(--steel-2); text-transform:uppercase;">Fase 01</div>
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: .15em; color: var(--steel-2);">Feb–Mar 2026</div>
+        </div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 38px; color: var(--bone-3); letter-spacing: -0.025em; line-height: 1.05;">Diseño y<br/>planificación</h4>
+        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); display:flex; align-items:center; gap: 16px;">
+          <div style="width: 8px; height: 8px; background: var(--steel-2); border-radius: 50%;"></div>
+          <div style="font-family: var(--mono); font-size: 13px; color: var(--steel-2); letter-spacing: .1em;">Entregado · 16 marzo 2026</div>
+        </div>
+      </div>
+
+      <div data-reveal="up" style="border: 1px solid var(--accent); padding: 36px; position:relative; background: linear-gradient(180deg, rgba(46,91,186,.10), transparent);">
+        <div style="position:absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent);"></div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 24px;">
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: .22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500;">Fase 02 · Actual</div>
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: .15em; color: var(--accent-2);">Mar–Abr 2026</div>
+        </div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 38px; color: var(--bone); letter-spacing: -0.025em; line-height: 1.05;">Construcción<br/>técnica</h4>
+        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); display:flex; align-items:center; gap: 16px;">
+          <div style="width: 8px; height: 8px; background: var(--accent-2); border-radius: 50%; box-shadow: 0 0 12px var(--accent-2);"></div>
+          <div style="font-family: var(--mono); font-size: 13px; color: var(--accent-2); letter-spacing: .1em;">Entregado · 30 abril 2026</div>
+        </div>
+      </div>
+
+      <div data-reveal="up" style="border: 1px dashed var(--line); padding: 36px; position:relative;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 24px;">
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: .22em; color: var(--steel-2); text-transform:uppercase;">Fase 03</div>
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: .15em; color: var(--steel-2);">Mayo 2026</div>
+        </div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 38px; color: var(--bone-3); letter-spacing: -0.025em; line-height: 1.05;">Proyecto<br/>final</h4>
+        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); display:flex; align-items:center; gap: 16px;">
+          <div style="width: 8px; height: 8px; border: 1.5px solid var(--steel-2); border-radius: 50%;"></div>
+          <div style="font-family: var(--mono); font-size: 13px; color: var(--steel-2); letter-spacing: .1em;">Entrega · 19 mayo 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--line); display:grid; grid-template-columns: 1fr 2fr; gap: 80px; align-items:start;">
+      <div data-reveal="left">
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: .22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500; margin-bottom: 16px;">Sistema de rotación</div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 36px; color: var(--bone); letter-spacing: -0.025em; line-height: 1.1;">Tres perfiles. <span style="color: var(--accent-2); font-weight: 300;">Ninguna dependencia.</span></h4>
+      </div>
+      <div data-reveal="right" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+        <div>
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--accent-2); text-transform:uppercase; margin-bottom: 8px;">Gestión</div>
+          <p style="font-family: var(--sans); font-weight: 300; font-size: 17px; line-height: 1.5; color: var(--bone-3);">Coordinación, planificación, comunicación con dirección académica.</p>
+        </div>
+        <div>
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--accent-2); text-transform:uppercase; margin-bottom: 8px;">Análisis</div>
+          <p style="font-family: var(--sans); font-weight: 300; font-size: 17px; line-height: 1.5; color: var(--bone-3);">Modelado cuantitativo, métricas financieras, validación estadística.</p>
+        </div>
+        <div>
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--accent-2); text-transform:uppercase; margin-bottom: 8px;">Comunicación</div>
+          <p style="font-family: var(--sans); font-weight: 300; font-size: 17px; line-height: 1.5; color: var(--bone-3);">Diseño editorial, narrativa visual, presentación de resultados.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Planificación</span>
+    <span class="num">09 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 10 — TRABAJOS POR FASE                    -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="10 Trabajos">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">01 · Cómo se hizo</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">Catálogo de trabajos · 23 entregables · 3 fases</div>
+    <h3 class="title" style="margin-top: 12px;">Hito a hito. <span class="ital">Sin atajos.</span></h3>
+
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 44px;">
+
+      <!-- FASE 01 -->
+      <div data-reveal="up" style="display:flex; flex-direction: column; gap: 18px;">
+        <div style="border-top: 2px solid var(--steel-2); padding-top: 18px; display:flex; justify-content:space-between; align-items:baseline;">
+          <div>
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase;">Fase 01 · Feb–Mar 2026</div>
+            <div style="font-family: var(--sans); font-weight: 600; font-size: 26px; color: var(--bone-3); letter-spacing: -0.025em; margin-top: 6px;">Diseño y planificación</div>
+          </div>
+          <div style="font-family: var(--mono); font-size: 32px; color: var(--steel-2); font-weight: 500; letter-spacing: -0.02em;">07</div>
+        </div>
+        <div style="display:flex; flex-direction:column;">
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">1.1</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Definir empresa simulada</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">1.2</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Selección de activos</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">1.3</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Problema de investigación</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">1.4</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Planificación del proyecto</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">1.5</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Diseño del sistema</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">1.6</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">UML · 13 casos / 4 actores</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0;"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">1.7</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Redacción · Entrega 1</span></div>
+        </div>
+      </div>
+
+      <!-- FASE 02 -->
+      <div data-reveal="up" style="display:flex; flex-direction: column; gap: 18px;">
+        <div style="border-top: 2px solid var(--accent); padding-top: 18px; display:flex; justify-content:space-between; align-items:baseline;">
+          <div>
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500;">Fase 02 · Mar–Abr 2026</div>
+            <div style="font-family: var(--sans); font-weight: 600; font-size: 26px; color: var(--bone); letter-spacing: -0.025em; margin-top: 6px;">Construcción técnica</div>
+          </div>
+          <div style="font-family: var(--mono); font-size: 32px; color: var(--accent-2); font-weight: 700; letter-spacing: -0.02em;">10</div>
+        </div>
+        <div style="display:flex; flex-direction:column;">
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.1</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Dataset Kaggle · 12k registros</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.2</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Análisis descriptivo de clientes</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.3</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Segmentación inicial</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.4</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Visualización correcta</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.5</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Descarga de datos financieros</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.6</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Análisis financiero básico</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.7</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Limpieza y preparación</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.8</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Predicciones WMA + MAE</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.9</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">GitHub profesionalizado</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 9px 0;"><span style="font-family: var(--mono); font-size: 12px; color: var(--accent-2); letter-spacing: .05em;">2.10</span><span style="font-family: var(--sans); font-size: 14px; color: var(--bone-2); letter-spacing: -0.005em;">Documentación · Entrega 2</span></div>
+        </div>
+      </div>
+
+      <!-- FASE 03 -->
+      <div data-reveal="up" style="display:flex; flex-direction: column; gap: 18px;">
+        <div style="border-top: 2px dashed var(--steel-2); padding-top: 18px; display:flex; justify-content:space-between; align-items:baseline;">
+          <div>
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase;">Fase 03 · Mayo 2026</div>
+            <div style="font-family: var(--sans); font-weight: 600; font-size: 26px; color: var(--bone-3); letter-spacing: -0.025em; margin-top: 6px;">Proyecto final</div>
+          </div>
+          <div style="font-family: var(--mono); font-size: 32px; color: var(--steel-2); font-weight: 500; letter-spacing: -0.02em;">06</div>
+        </div>
+        <div style="display:flex; flex-direction:column;">
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">3.1</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Coherencia del proyecto</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">3.2</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Modelos LSTM + Prophet</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">3.3</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Clustering K-Means + DBSCAN</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">3.4</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Backtesting de carteras</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">3.5</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Prototipo FastAPI + React</span></div>
+          <div style="display:grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 11px 0;"><span style="font-family: var(--mono); font-size: 12px; color: var(--steel-2); letter-spacing: .05em;">3.6</span><span style="font-family: var(--sans); font-size: 15px; color: var(--bone-2); letter-spacing: -0.005em;">Memoria final + sesión oral</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team rotation summary -->
+    <div data-reveal style="margin-top: 32px; padding: 22px 28px; border: 1px solid var(--line); background: rgba(46,91,186,.06); display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 28px; align-items: center;">
+      <div>
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500; margin-bottom: 6px;">Equipo · 3 integrantes</div>
+        <div style="font-family: var(--sans); font-size: 17px; color: var(--bone); letter-spacing: -0.015em; line-height: 1.3;">Rotación por fase entre gestión, análisis y comunicación. Ninguna pieza depende de una sola persona.</div>
+      </div>
+      <div style="border-left: 1px solid var(--line); padding-left: 22px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase;">Aceves</div>
+        <div style="font-family: var(--sans); font-size: 13px; color: var(--bone-3); margin-top: 6px; line-height: 1.4;">Gestión · Análisis · Comunicación</div>
+      </div>
+      <div style="border-left: 1px solid var(--line); padding-left: 22px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase;">Del Peso</div>
+        <div style="font-family: var(--sans); font-size: 13px; color: var(--bone-3); margin-top: 6px; line-height: 1.4;">Análisis · Comunicación · Gestión</div>
+      </div>
+      <div style="border-left: 1px solid var(--line); padding-left: 22px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase;">Duque</div>
+        <div style="font-family: var(--sans); font-size: 13px; color: var(--bone-3); margin-top: 6px; line-height: 1.4;">Comunicación · Gestión · Análisis</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Trabajos</span>
+    <span class="num">10 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 11 — DIVIDER 02                           -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="07 Bloque 02" class="divider">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Bloque 02</div>
+  </div>
+
+  <div class="num" data-reveal="scale">02</div>
+  <div class="body">
+    <div class="tag" data-reveal>Análisis</div>
+    <h2 data-reveal="up">Análisis<br/><span class="ital">financiero.</span></h2>
+    <div class="lede" data-reveal>No quién sube más. Quién compensa mejor el riesgo. Métricas auditables sobre el universo 2023–26.</div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2</span>
+    <span class="num">11 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 8 — METRICS TABLE                         -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="08 Metricas" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">02 · Métricas</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">Universo 2023 — 2026 · datos yfinance</div>
+    <h3 class="title" style="margin-top:12px;">Métricas de <span class="ital">riesgo-retorno.</span></h3>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Métrica</th>
+          <th style="text-align:right; font-family: var(--sans); font-weight: 600; text-transform:none; letter-spacing:-0.02em; font-size: 24px; color: #4A7CC9;">LINK-USD</th>
+          <th style="text-align:right; font-family: var(--sans); font-weight: 600; text-transform:none; letter-spacing:-0.02em; font-size: 24px; color: #6E8DAE;">DOT-USD</th>
+          <th style="text-align:right; font-family: var(--sans); font-weight: 700; text-transform:none; letter-spacing:-0.02em; font-size: 24px; color: var(--accent-3);">ITA · ETF</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Retorno acumulado</td>
+          <td style="text-align:right;" class="pos">+187%</td>
+          <td style="text-align:right;" class="pos">+134%</td>
+          <td style="text-align:right;">+62%</td>
+        </tr>
+        <tr>
+          <td>Volatilidad anualizada</td>
+          <td style="text-align:right;">~82%</td>
+          <td style="text-align:right;">~75%</td>
+          <td style="text-align:right; color: var(--good);">~18%</td>
+        </tr>
+        <tr>
+          <td>Drawdown máximo</td>
+          <td style="text-align:right;" class="neg">−68%</td>
+          <td style="text-align:right;" class="neg">−72%</td>
+          <td style="text-align:right;">−12%</td>
+        </tr>
+        <tr>
+          <td>Sharpe Ratio</td>
+          <td style="text-align:right;">0.89</td>
+          <td style="text-align:right;">0.71</td>
+          <td style="text-align:right; font-family: var(--mono); font-weight: 700; font-size: 32px; color: var(--accent-3);">1.43</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footnote" style="color: var(--steel);">
+      Correlación LINK·ITA = <b style="color: var(--ink);">−0.08</b> &nbsp;·&nbsp; prácticamente nula. Diversificación real, no asumida.
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Riesgo-Retorno</span>
+    <span class="num">12 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 9 — SHARPE FOCUS                          -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="09 Sharpe" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">02 · Eficiencia</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">Sharpe Ratio · eficiencia ajustada por riesgo</div>
+    <h3 class="title" style="margin-top:12px;">El activo <span class="ital">tradicional</span><br/>compensa mejor.</h3>
+
+    <div class="sharpe">
+      <div class="lhs" data-reveal="left">
+        <div class="big">El Sharpe de <span class="steel">ITA</span> confirma que, ajustado por riesgo, el activo tradicional ofrece la <span class="ital">mejor compensación.</span></div>
+        <div class="body">Esto justifica su papel central en las carteras diversificadas de la Fase 2 y su rol como ancla institucional en los tres perfiles.</div>
+      </div>
+      <div class="sharpe-bars" data-reveal="right">
+        <div style="font-family: var(--mono); font-size:12px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase; margin-bottom:8px;">Sharpe Ratio · más alto = mejor</div>
+        <div class="sharpe-bar dot">
+          <div class="lab">DOT-USD</div>
+          <div class="track"><div class="fill" style="width: 49.6%;"></div></div>
+          <div class="val">0.71</div>
+        </div>
+        <div class="sharpe-bar link">
+          <div class="lab">LINK-USD</div>
+          <div class="track"><div class="fill" style="width: 62.2%;"></div></div>
+          <div class="val">0.89</div>
+        </div>
+        <div class="sharpe-bar ita">
+          <div class="lab">ITA · ETF</div>
+          <div class="track"><div class="fill" style="width: 100%;"></div></div>
+          <div class="val">1.43</div>
+        </div>
+        <div style="margin-top:24px; padding-top:24px; border-top: 1px solid var(--line-bone); font-family: var(--mono); font-size:13px; color: var(--steel); line-height:1.6;">
+          Una unidad de riesgo en ITA produce <b style="color:var(--accent-3);">~1.6×</b> el retorno de la misma unidad en LINK, y <b style="color:var(--accent-3);">~2×</b> el de DOT.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Eficiencia</span>
+    <span class="num">13 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 10 — DIVIDER 03                           -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="10 Bloque 03" class="divider">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Bloque 03</div>
+  </div>
+
+  <div class="num" data-reveal="scale">03</div>
+  <div class="body">
+    <div class="tag" data-reveal>Predicciones</div>
+    <h2 data-reveal="up">Predicciones<br/>y error <span class="ital">MAE.</span></h2>
+    <div class="lede" data-reveal>Un baseline deliberado: WMA + regresión lineal sobre ventana deslizante. Honestidad en el error, no promesas.</div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2</span>
+    <span class="num">14 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 11 — MAE                                  -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="11 MAE">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">03 · Error MAE</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">MAE por horizonte temporal · LINK-USD</div>
+    <h3 class="title" style="margin-top:12px;">El error crece <span class="ital">con el tiempo.</span></h3>
+
+    <div class="mae-grid">
+      <div data-reveal="left">
+        <table class="mae-table">
+          <thead>
+            <tr><th>Horizonte</th><th>MAE (USD)</th><th>Fiabilidad</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="h">1 día</td><td>0.41</td><td class="stars s5">★★★★★</td></tr>
+            <tr><td class="h">5 días</td><td>1.87</td><td class="stars s4">★★★★☆</td></tr>
+            <tr><td class="h">10 días</td><td>3.94</td><td class="stars s3">★★★☆☆</td></tr>
+            <tr><td class="h">15 días</td><td>6.23</td><td class="stars s2">★★☆☆☆</td></tr>
+          </tbody>
+        </table>
+
+        <div class="mae-why">
+          <div class="why">
+            <div class="n">01</div>
+            <h5>Acumulación recursiva</h5>
+            <p>Cada predicción introduce un error que se propaga a la siguiente.</p>
+          </div>
+          <div class="why">
+            <div class="n">02</div>
+            <h5>Eventos exógenos</h5>
+            <p>Noticias, regulación y choques no observables en la serie histórica.</p>
+          </div>
+          <div class="why">
+            <div class="n">03</div>
+            <h5>Cambio de régimen</h5>
+            <p>El mercado puede cambiar de fase y romper supuestos del modelo.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mae-chart" data-reveal="right">
+        <div class="ch-title">Visualización del error</div>
+        <h4>Crecimiento <span class="ital">aproximadamente lineal</span> del error con el horizonte.</h4>
+
+        <div style="display:flex; flex-direction:column; gap: 18px; margin-top: 16px;">
+          <div class="mae-row"><div class="h">1d</div><div class="bar"><div class="f" style="width:6.6%;"></div></div><div class="v">0.41</div></div>
+          <div class="mae-row"><div class="h">5d</div><div class="bar"><div class="f" style="width:30%;"></div></div><div class="v">1.87</div></div>
+          <div class="mae-row"><div class="h">10d</div><div class="bar"><div class="f" style="width:63.2%;"></div></div><div class="v">3.94</div></div>
+          <div class="mae-row"><div class="h">15d</div><div class="bar"><div class="f" style="width:100%;"></div></div><div class="v">6.23</div></div>
+        </div>
+
+        <div style="margin-top: 24px; padding: 24px; background: rgba(46,91,186,.10); border-left: 2px solid var(--accent);">
+          <div style="font-family: var(--mono); font-size:12px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; margin-bottom: 8px; font-weight: 500;">Posicionamiento</div>
+          <div style="font-family: var(--sans); font-weight: 300; font-size: 21px; line-height:1.5; color: var(--bone); letter-spacing:-0.01em;">
+            «Predicciones de 1–5 días como señal táctica. A 10–15 días, siempre con intervalos de confianza explícitos. <span style="font-style:italic; color: var(--accent-2);">Transparencia como diferenciador.</span>»
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · MAE</span>
+    <span class="num">15 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 14 — MAE FASE 3 · MODELOS AVANZADOS       -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="14 MAE Fase 3" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Fase 3 · Modelos avanzados</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">MAE por activo · LSTM y Prophet</div>
+    <h3 class="title" style="margin-top: 12px;">Tres activos. <span class="ital">Tres errores.</span></h3>
+
+    <div style="display:grid; grid-template-columns: 1.4fr 1fr; gap: 96px; margin-top: 48px; flex:1; align-items: start;">
+      <div data-reveal="left">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Horizonte</th>
+              <th style="text-align:right; font-family: var(--sans); font-weight: 600; text-transform:none; letter-spacing:-0.02em; font-size: 22px; color: #4A7CC9;">LINK</th>
+              <th style="text-align:right; font-family: var(--sans); font-weight: 600; text-transform:none; letter-spacing:-0.02em; font-size: 22px; color: #6E8DAE;">DOT</th>
+              <th style="text-align:right; font-family: var(--sans); font-weight: 700; text-transform:none; letter-spacing:-0.02em; font-size: 22px; color: var(--accent-3);">ITA</th>
+              <th style="text-align:right;">Fiabilidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1 día</td>
+              <td style="text-align:right;">0.41 $</td>
+              <td style="text-align:right;">0.12 $</td>
+              <td style="text-align:right;">0.58 $</td>
+              <td style="text-align:right; letter-spacing: 4px; color: var(--accent); font-family: var(--sans);">★★★★★</td>
+            </tr>
+            <tr>
+              <td>5 días</td>
+              <td style="text-align:right;">1.87 $</td>
+              <td style="text-align:right;">0.54 $</td>
+              <td style="text-align:right;">2.31 $</td>
+              <td style="text-align:right; letter-spacing: 4px; color: #4A7CC9; font-family: var(--sans);">★★★★☆</td>
+            </tr>
+            <tr>
+              <td>10 días</td>
+              <td style="text-align:right;">3.94 $</td>
+              <td style="text-align:right;">1.18 $</td>
+              <td style="text-align:right;">4.72 $</td>
+              <td style="text-align:right; letter-spacing: 4px; color: var(--steel-blue-2); font-family: var(--sans);">★★★☆☆</td>
+            </tr>
+            <tr>
+              <td>15 días</td>
+              <td style="text-align:right;">6.23 $</td>
+              <td style="text-align:right;">1.84 $</td>
+              <td style="text-align:right;">7.45 $</td>
+              <td style="text-align:right; letter-spacing: 4px; color: var(--steel); font-family: var(--sans);">★★☆☆☆</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="footnote" style="color: var(--steel); margin-top: 32px;">
+          MAE = (1/n) · Σ |y<sub style="font-family: var(--mono); font-size: 11px;">predicho</sub> − y<sub style="font-family: var(--mono); font-size: 11px;">real</sub>| &nbsp;·&nbsp; Más interpretable que RMSE para el usuario final · no penaliza errores grandes de forma desproporcionada.
+        </div>
+      </div>
+
+      <div data-reveal="right" style="display:flex; flex-direction:column; gap: 28px;">
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing:.22em; color: var(--accent); text-transform:uppercase; font-weight: 500;">Mejoras Fase 3 sobre baseline WMA</div>
+
+        <div style="padding: 28px; border: 1px solid var(--line-bone); background: rgba(46,91,186,.04);">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 16px;">
+            <div style="font-family: var(--sans); font-weight: 600; font-size: 28px; color: var(--ink); letter-spacing: -0.02em;">LSTM</div>
+            <div style="font-family: var(--mono); font-weight: 700; font-size: 36px; color: var(--accent-3); letter-spacing: -0.02em;">−33%</div>
+          </div>
+          <div style="height: 8px; background: var(--bone-2); position:relative;">
+            <div style="height:100%; width: 67%; background: var(--accent-3);"></div>
+          </div>
+          <div style="font-family: var(--sans); font-weight: 300; font-size: 15px; color: var(--steel); margin-top: 12px; line-height: 1.4;">Red neuronal recurrente · captura dependencias temporales largas.</div>
+        </div>
+
+        <div style="padding: 28px; border: 1px solid var(--line-bone);">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 16px;">
+            <div style="font-family: var(--sans); font-weight: 600; font-size: 28px; color: var(--ink); letter-spacing: -0.02em;">Prophet</div>
+            <div style="font-family: var(--mono); font-weight: 700; font-size: 36px; color: var(--accent); letter-spacing: -0.02em;">−17%</div>
+          </div>
+          <div style="height: 8px; background: var(--bone-2); position:relative;">
+            <div style="height:100%; width: 83%; background: var(--accent);"></div>
+          </div>
+          <div style="font-family: var(--sans); font-weight: 300; font-size: 15px; color: var(--steel); margin-top: 12px; line-height: 1.4;">Descomposición de tendencia + estacionalidad · robusto a outliers.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Modelos Fase 3</span>
+    <span class="num">16 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 15 — DIVIDER 04                           -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="12 Bloque 04" class="divider">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Bloque 04</div>
+  </div>
+
+  <div class="num" data-reveal="scale">04</div>
+  <div class="body">
+    <div class="tag" data-reveal>Personas</div>
+    <h2 data-reveal="up">Segmentación<br/>y <span class="ital">perfiles.</span></h2>
+    <div class="lede" data-reveal>12.000 registros reales del Finance Trends &amp; Behaviour Dataset. Reglas con umbrales dinámicos calculados sobre el propio dataset.</div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2</span>
+    <span class="num">17 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 13 — PROFILES                             -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="13 Arquetipos">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">04 · Arquetipos</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">Tres arquetipos · Kaggle · n = 12.000</div>
+    <h3 class="title" style="margin-top:12px;">Los tres <span class="ital">inversores</span> que existen.</h3>
+
+    <div class="profiles">
+      <div class="profile hype" data-reveal="up">
+        <div class="tag-row"><span class="tag">Volumen</span></div>
+        <div class="pct">74.9<span class="small">%</span></div>
+        <div>
+          <div class="name">Ex-Víctima<br/>del Hype</div>
+          <div class="count" style="margin-top:8px;">8.983 clientes</div>
+        </div>
+        <div class="desc">Inversores jóvenes (<b style="color:var(--bone);">~27 años</b>) con experiencia limitada que han tomado decisiones emocionales en el pasado. El segmento más receptivo al posicionamiento educativo.</div>
+        <div class="meta">
+          <span>Edad <b>27</b></span>
+          <span>Exp. <b>baja</b></span>
+          <span>Riesgo <b>medio</b></span>
+        </div>
+      </div>
+      <div class="profile hyb" data-reveal="up">
+        <div class="tag-row"><span class="tag">Valor</span></div>
+        <div class="pct">15.7<span class="small">%</span></div>
+        <div>
+          <div class="name">Inversor<br/>Híbrido</div>
+          <div class="count" style="margin-top:8px;">1.884 clientes</div>
+        </div>
+        <div class="desc">Ingresos <b style="color:var(--bone);">+43% sobre la media</b>. Alta tolerancia al riesgo. Capaz de asumir carteras balanceadas entre cripto y ETF. Exige análisis sofisticado.</div>
+        <div class="meta">
+          <span>Ingresos <b>+43%</b></span>
+          <span>Exp. <b>alta</b></span>
+          <span>Riesgo <b>alto</b></span>
+        </div>
+      </div>
+      <div class="profile cons" data-reveal="up">
+        <div class="tag-row"><span class="tag">Fidelidad</span></div>
+        <div class="pct">9.4<span class="small">%</span></div>
+        <div>
+          <div class="name">Riesgo<br/>Controlado</div>
+          <div class="count" style="margin-top:8px;">1.133 clientes</div>
+        </div>
+        <div class="desc">Priorizan la protección. Toleran menos pérdidas pero quieren exposición controlada al blockchain. Comunicación de riesgo proactiva, fidelización elevada.</div>
+        <div class="meta">
+          <span>Tolerancia <b>baja</b></span>
+          <span>Lealtad <b>alta</b></span>
+          <span>Riesgo <b>bajo</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Arquetipos</span>
+    <span class="num">18 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 17 — VALIDACIÓN CLUSTERING FASE 3         -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="17 Validacion clustering">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Fase 3 · Validación estadística</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">K-Means + DBSCAN · validación de arquetipos</div>
+    <h3 class="title" style="margin-top: 12px;">Los tres perfiles, <span class="ital">verificados.</span></h3>
+
+    <div style="display:grid; grid-template-columns: 1fr 1.15fr; gap: 80px; margin-top: 48px; flex:1; align-items: start;">
+      <div data-reveal="left" style="display:flex; flex-direction:column; gap: 28px;">
+        <div style="padding: 44px; border: 1px solid var(--accent); background: linear-gradient(180deg, rgba(46,91,186,.10), transparent);">
+          <div style="font-family: var(--mono); font-size: 12px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500; margin-bottom: 16px;">Adjusted Rand Index</div>
+          <div style="font-family: var(--sans); font-weight: 700; font-size: 160px; color: var(--accent-2); line-height: 0.85; letter-spacing: -0.05em;">0.61</div>
+          <div style="font-family: var(--sans); font-weight: 300; font-size: 20px; color: var(--bone-2); margin-top: 24px; line-height: 1.45; letter-spacing: -0.015em;">Acuerdo sustancial entre el clustering no supervisado y nuestra segmentación basada en reglas. Los tres perfiles son <b style="font-weight: 600; color: var(--bone);">estadísticamente coherentes.</b></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div style="padding: 22px; border: 1px solid var(--line);">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase; margin-bottom: 8px;">Algoritmo 01</div>
+            <div style="font-family: var(--sans); font-weight: 600; font-size: 24px; color: var(--bone); letter-spacing: -0.02em;">K-Means</div>
+            <p style="font-family: var(--sans); font-weight: 300; font-size: 14px; color: var(--bone-3); margin-top: 8px; line-height: 1.4;">Particionamiento por centroides, k = 3 fijo.</p>
+          </div>
+          <div style="padding: 22px; border: 1px solid var(--line);">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel-2); text-transform:uppercase; margin-bottom: 8px;">Algoritmo 02</div>
+            <div style="font-family: var(--sans); font-weight: 600; font-size: 24px; color: var(--bone); letter-spacing: -0.02em;">DBSCAN</div>
+            <p style="font-family: var(--sans); font-weight: 300; font-size: 14px; color: var(--bone-3); margin-top: 8px; line-height: 1.4;">Densidad, detección de outliers de comportamiento.</p>
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal="right">
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500; margin-bottom: 20px;">Comparativa estadística por arquetipo</div>
+
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding: 12px 0; font-family: var(--mono); font-size: 10px; letter-spacing:.22em; text-transform:uppercase; color: var(--steel-2); border-bottom: 1px solid var(--bone-3); font-weight: 500;">Variable</th>
+              <th style="text-align:right; padding: 12px 0; font-family: var(--sans); font-size: 13px; color: #7AA3DD; border-bottom: 1px solid var(--bone-3); letter-spacing: -0.01em; font-weight: 500;">Ex-Hype</th>
+              <th style="text-align:right; padding: 12px 0; font-family: var(--sans); font-size: 13px; color: var(--accent-2); border-bottom: 1px solid var(--bone-3); letter-spacing: -0.01em; font-weight: 600;">Híbrido</th>
+              <th style="text-align:right; padding: 12px 0; font-family: var(--sans); font-size: 13px; color: var(--steel-blue-2); border-bottom: 1px solid var(--bone-3); letter-spacing: -0.01em; font-weight: 500;">Controlado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 18px 0; font-family: var(--sans); font-weight: 500; font-size: 17px; color: var(--bone); border-bottom: 1px solid var(--line); letter-spacing: -0.01em;">Ingresos anuales</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--bone-2); border-bottom: 1px solid var(--line);">49.791 €</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 700; font-size: 20px; color: var(--accent-2); border-bottom: 1px solid var(--line);">70.981 €</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--bone-2); border-bottom: 1px solid var(--line);">70.408 €</td>
+            </tr>
+            <tr>
+              <td style="padding: 18px 0; font-family: var(--sans); font-weight: 500; font-size: 17px; color: var(--bone); border-bottom: 1px solid var(--line); letter-spacing: -0.01em;">Experiencia (años)</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--bone-2); border-bottom: 1px solid var(--line);">7.9</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 700; font-size: 20px; color: var(--accent-2); border-bottom: 1px solid var(--line);">14.5</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--bone-2); border-bottom: 1px solid var(--line);">14.4</td>
+            </tr>
+            <tr>
+              <td style="padding: 18px 0; font-family: var(--sans); font-weight: 500; font-size: 17px; color: var(--bone); border-bottom: 1px solid var(--line); letter-spacing: -0.01em;">Tolerancia al riesgo</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--bone-2); border-bottom: 1px solid var(--line);">0.53</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 700; font-size: 20px; color: var(--accent-2); border-bottom: 1px solid var(--line);">0.70</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--bone-2); border-bottom: 1px solid var(--line);">0.26</td>
+            </tr>
+            <tr>
+              <td style="padding: 18px 0; font-family: var(--sans); font-weight: 500; font-size: 17px; color: var(--bone); border-bottom: 1px solid var(--line); letter-spacing: -0.01em;">Factor principal</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-size: 14px; color: var(--bone-3); border-bottom: 1px solid var(--line); letter-spacing: .08em;">RETURNS</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--accent-2); border-bottom: 1px solid var(--line); letter-spacing: .08em;">RETURNS</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-size: 14px; color: var(--bone-3); border-bottom: 1px solid var(--line); letter-spacing: .08em;">RISK</td>
+            </tr>
+            <tr>
+              <td style="padding: 18px 0; font-family: var(--sans); font-weight: 500; font-size: 17px; color: var(--bone); letter-spacing: -0.01em;">Objetivo</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-size: 14px; color: var(--bone-3); letter-spacing: .08em;">CAPITAL APPR.</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--accent-2); letter-spacing: .08em;">CAPITAL APPR.</td>
+              <td style="text-align:right; padding: 18px 0; font-family: var(--mono); font-size: 14px; color: var(--bone-3); letter-spacing: .08em;">GROWTH</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 24px; padding: 14px 22px; background: rgba(46,91,186,.10); border-left: 2px solid var(--accent); font-family: var(--mono); font-size: 12px; color: var(--bone-2); line-height: 1.6; letter-spacing: .03em;">
+          Variables <b style="color: var(--accent-2);">sintéticas</b>: tolerancia al riesgo (Risk→0.25 / Growth→0.55 / Returns→0.70), ingresos (normal μ=55.000€ σ=20.000€), experiencia (uniforme 0–20 años), % crypto (uniforme 5–70%).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Validación clustering</span>
+    <span class="num">19 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 18 — ALLOCATIONS                          -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="14 Carteras" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">04 · Carteras</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">Carteras recomendadas por perfil</div>
+    <h3 class="title" style="margin-top:12px;">Una composición <span class="ital">por arquetipo.</span></h3>
+
+    <div class="alloc-grid">
+      <div class="alloc-list">
+        <div class="alloc-row" data-reveal="left">
+          <div class="head">
+            <div class="name">Inversor Híbrido</div>
+            <div class="pcts">
+              <span style="color:var(--link);">LINK <b>40%</b></span>
+              <span style="color:var(--dot);">DOT <b>25%</b></span>
+              <span style="color:var(--accent-3);">ITA <b>35%</b></span>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="seg link" style="width:40%;">40</div>
+            <div class="seg dot"  style="width:25%;">25</div>
+            <div class="seg ita"  style="width:35%;">35</div>
+          </div>
+        </div>
+
+        <div class="alloc-row">
+          <div class="head">
+            <div class="name">Ex-Víctima del Hype</div>
+            <div class="pcts">
+              <span style="color:var(--link);">LINK <b>30%</b></span>
+              <span style="color:var(--dot);">DOT <b>10%</b></span>
+              <span style="color:var(--accent-3);">ITA <b>60%</b></span>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="seg link" style="width:30%;">30</div>
+            <div class="seg dot"  style="width:10%;">10</div>
+            <div class="seg ita"  style="width:60%;">60</div>
+          </div>
+        </div>
+
+        <div class="alloc-row" data-reveal="left">
+          <div class="head">
+            <div class="name">Riesgo Controlado</div>
+            <div class="pcts">
+              <span style="color:var(--link);">LINK <b>10%</b></span>
+              <span style="color:var(--dot);">DOT <b>20%</b></span>
+              <span style="color:var(--accent-3);">ITA <b>70%</b></span>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="seg link" style="width:10%;">10</div>
+            <div class="seg dot"  style="width:20%;">20</div>
+            <div class="seg ita"  style="width:70%;">70</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:24px; margin-top: 16px; padding-top: 24px; border-top: 1px solid var(--line-bone); font-family: var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color: var(--steel);">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:14px;height:14px;background:var(--link);"></span>LINK · DeFi</div>
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:14px;height:14px;background:var(--dot);"></span>DOT · Interop.</div>
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:14px;height:14px;background:var(--accent-3);"></span>ITA · Ancla</div>
+        </div>
+      </div>
+
+      <div data-reveal="right">
+        <div class="alloc-quote" style="border-left-color: var(--accent); color: var(--ink);">
+          El uso de <b>ITA al 70%</b> en perfiles conservadores reduce la covarianza global y protege el capital ante caídas drásticas en el mercado cripto.
+        </div>
+
+        <div style="margin-top:48px; display:grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div style="padding: 28px; border:1px solid var(--line-bone);">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase; margin-bottom:8px;">Sharpe ITA</div>
+            <div style="font-family: var(--sans); font-weight: 700; font-size: 64px; color: var(--accent-3); line-height:1; letter-spacing:-0.04em;">1.43</div>
+            <div style="font-family: var(--sans); font-weight:300; font-size:15px; color: var(--steel); margin-top:8px;">Mejor compensación riesgo-retorno del universo.</div>
+          </div>
+          <div style="padding: 28px; border:1px solid var(--line-bone);">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase; margin-bottom:8px;">Corr. LINK · ITA</div>
+            <div style="font-family: var(--sans); font-weight: 700; font-size: 64px; color: var(--ink); line-height:1; letter-spacing:-0.04em;">−0.08</div>
+            <div style="font-family: var(--sans); font-weight:300; font-size:15px; color: var(--steel); margin-top:8px;">Correlación nula. Diversificación real, medida.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Carteras</span>
+    <span class="num">20 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 19 — PRESUPUESTO FASE 3                   -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="19 Presupuesto" data-theme="bone">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Fase 3 · Presupuesto</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow" style="color: var(--accent);">Simulación profesional · entrega como consultora</div>
+    <h3 class="title" style="margin-top: 12px;">23.869 €. <span class="ital">Por qué.</span></h3>
+
+    <div style="display:grid; grid-template-columns: 1.55fr 1fr; gap: 72px; margin-top: 40px; flex:1; align-items: start;">
+      <div data-reveal="left">
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase; margin-bottom: 16px;">Imputación por rol · 660 horas totales</div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding: 14px 0; font-family: var(--mono); font-size: 11px; letter-spacing:.22em; text-transform:uppercase; color: var(--steel); border-bottom: 1px solid var(--ink); font-weight: 500;">Rol</th>
+              <th style="text-align:right; padding: 14px 0; font-family: var(--mono); font-size: 11px; letter-spacing:.22em; text-transform:uppercase; color: var(--steel); border-bottom: 1px solid var(--ink); font-weight: 500;">Tarifa €/h</th>
+              <th style="text-align:right; padding: 14px 0; font-family: var(--mono); font-size: 11px; letter-spacing:.22em; text-transform:uppercase; color: var(--steel); border-bottom: 1px solid var(--ink); font-weight: 500;">Horas</th>
+              <th style="text-align:right; padding: 14px 0; font-family: var(--mono); font-size: 11px; letter-spacing:.22em; text-transform:uppercase; color: var(--steel); border-bottom: 1px solid var(--ink); font-weight: 500;">Importe</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 16px 0; font-family: var(--sans); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone); letter-spacing: -0.01em;">Jefe de proyecto</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">52,08</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">60</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone);">3.125,00 €</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 0; font-family: var(--sans); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone); letter-spacing: -0.01em;">Analista funcional</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">45,57</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">80</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone);">3.645,83 €</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 0; font-family: var(--sans); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone); letter-spacing: -0.01em;">Consultor</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">45,57</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">60</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone);">2.734,38 €</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 0; font-family: var(--sans); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone); letter-spacing: -0.01em;">Técnico de sistemas</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">22,79</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 700; font-size: 17px; color: var(--accent); border-bottom: 1px solid var(--line-bone);">200</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone);">4.557,29 €</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 0; font-family: var(--sans); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone); letter-spacing: -0.01em;">Programador</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">22,79</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 700; font-size: 17px; color: var(--accent); border-bottom: 1px solid var(--line-bone);">180</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone);">4.101,56 €</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 0; font-family: var(--sans); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone); letter-spacing: -0.01em;">Marketing</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">19,53</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-size: 17px; color: var(--steel); border-bottom: 1px solid var(--line-bone);">80</td>
+              <td style="text-align:right; padding: 16px 0; font-family: var(--mono); font-weight: 500; font-size: 18px; color: var(--ink); border-bottom: 1px solid var(--line-bone);">1.562,50 €</td>
+            </tr>
+            <tr>
+              <td style="padding: 20px 0; font-family: var(--sans); font-weight: 700; font-size: 19px; color: var(--ink); letter-spacing: -0.015em;">Total</td>
+              <td style="text-align:right; padding: 20px 0;"></td>
+              <td style="text-align:right; padding: 20px 0; font-family: var(--mono); font-weight: 700; font-size: 22px; color: var(--accent-3);">660</td>
+              <td style="text-align:right; padding: 20px 0; font-family: var(--mono); font-weight: 700; font-size: 22px; color: var(--accent-3);">19.726,56 €</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top: 16px; font-family: var(--mono); font-size: 12px; color: var(--steel); letter-spacing: .03em; line-height: 1.5;">
+          Los roles técnicos concentran el grueso del esfuerzo · justificado por la naturaleza cuantitativa del proyecto.
+        </div>
+      </div>
+
+      <div data-reveal="right" style="display:flex; flex-direction:column; gap: 20px;">
+        <div style="padding: 28px; border: 1px solid var(--line-bone);">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase; margin-bottom: 8px;">Subtotal · sin IVA</div>
+          <div style="font-family: var(--mono); font-weight: 500; font-size: 34px; color: var(--ink); letter-spacing: -0.02em;">19.726,56 €</div>
+        </div>
+        <div style="padding: 28px; border: 1px solid var(--line-bone);">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--steel); text-transform:uppercase; margin-bottom: 8px;">IVA · 21%</div>
+          <div style="font-family: var(--mono); font-weight: 500; font-size: 34px; color: var(--ink); letter-spacing: -0.02em;">+4.142,58 €</div>
+        </div>
+        <div style="padding: 36px; background: var(--ink); color: var(--bone);">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; margin-bottom: 12px; font-weight: 500;">Total con IVA</div>
+          <div style="font-family: var(--sans); font-weight: 700; font-size: 56px; color: var(--bone); line-height: 0.9; letter-spacing: -0.04em;">23.869,14 €</div>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--bone-3); letter-spacing: .03em; line-height: 1.6;">
+            Hosting (Vercel + Railway) y datos (yfinance + Kaggle) <b style="color: var(--bone);">no incluidos · gratuitos.</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Presupuesto</span>
+    <span class="num">21 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 20 — ADVERTENCIAS DE RIESGO               -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="20 Advertencias">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Diferenciador editorial</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">Lo que el modelo no sabe · transparencia</div>
+    <h3 class="title" style="margin-top: 12px;">«Preferimos ser <span class="ital">la plataforma</span><br/>que dice lo que no sabe.»</h3>
+
+    <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap: 22px; margin-top: 56px;">
+      <div data-reveal="up" style="padding: 26px; border: 1px solid var(--line); display:flex; flex-direction: column; gap: 12px; background: linear-gradient(180deg, rgba(255,255,255,.02), transparent); min-height: 360px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500;">01 · Predicciones</div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 22px; color: var(--bone); letter-spacing: -0.02em; line-height: 1.2;">El MAE es histórico, no futuro.</h4>
+        <p style="font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.5; color: var(--bone-3);">Los modelos aprenden de patrones pasados. Un evento regulatorio o macroeconómico puede invalidar cualquier predicción en horas.</p>
+      </div>
+
+      <div data-reveal="up" style="padding: 26px; border: 1px solid var(--line); display:flex; flex-direction: column; gap: 12px; background: linear-gradient(180deg, rgba(255,255,255,.02), transparent); min-height: 360px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500;">02 · Segmentación</div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 22px; color: var(--bone); letter-spacing: -0.02em; line-height: 1.2;">Aproximación razonada, no medida.</h4>
+        <p style="font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.5; color: var(--bone-3);">Tolerancia y % crypto son variables sintéticas. La tolerancia no es constante: cambia con el ciclo de mercado y la experiencia.</p>
+      </div>
+
+      <div data-reveal="up" style="padding: 26px; border: 1px solid var(--line); display:flex; flex-direction: column; gap: 12px; background: linear-gradient(180deg, rgba(255,255,255,.02), transparent); min-height: 360px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500;">03 · Carteras</div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 22px; color: var(--bone); letter-spacing: -0.02em; line-height: 1.2;">Ilustrativas, no asesoramiento.</h4>
+        <p style="font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.5; color: var(--bone-3);">Propuestas del periodo 2023–26. No consideran fiscalidad, patrimonio total ni objetivos vitales del usuario.</p>
+      </div>
+
+      <div data-reveal="up" style="padding: 26px; border: 1px solid var(--line); display:flex; flex-direction: column; gap: 12px; background: linear-gradient(180deg, rgba(255,255,255,.02), transparent); min-height: 360px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500;">04 · Datos</div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 22px; color: var(--bone); letter-spacing: -0.02em; line-height: 1.2;">Sesgo del periodo analizado.</h4>
+        <p style="font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.5; color: var(--bone-3);">Ciclo post-FTX, aprobación del ETF BTC spot (ene 2024) y gasto OTAN. Los +187% / +134% no son extrapolables.</p>
+      </div>
+
+      <div data-reveal="up" style="padding: 26px; border: 1px solid var(--line); display:flex; flex-direction: column; gap: 12px; background: linear-gradient(180deg, rgba(255,255,255,.02), transparent); min-height: 360px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing:.22em; color: var(--accent-2); text-transform:uppercase; font-weight: 500;">05 · Régimen</div>
+        <h4 style="font-family: var(--sans); font-weight: 600; font-size: 22px; color: var(--bone); letter-spacing: -0.02em; line-height: 1.2;">Entrenamiento en mercado alcista.</h4>
+        <p style="font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.5; color: var(--bone-3);">Las correlaciones pueden romperse en crisis sistémica. La correlación LINK·ITA = −0.08 podría no mantenerse.</p>
+      </div>
+    </div>
+
+    <div data-reveal style="margin-top: 40px; padding: 26px 32px; border-left: 2px solid var(--accent); font-family: var(--sans); font-weight: 300; font-size: 22px; line-height: 1.5; color: var(--bone-2); letter-spacing: -0.015em;">
+      Esto es el marco del <b style="font-weight: 600; color: var(--accent-2);">hombre anumérico</b> aplicado: una plataforma que oculta el error de sus modelos no democratiza la inversión, reproduce el ruido del que el inversor necesita protegerse.
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Advertencias</span>
+    <span class="num">22 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 21 — CONCLUSIONS                          -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="15 Conclusiones">
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Cierre</div>
+  </div>
+
+  <div class="content">
+    <div class="eyebrow">Conclusiones estratégicas</div>
+    <h3 class="title" style="margin-top:12px;">Un sistema <span class="ital">funcional.</span><br/>Una oportunidad <span class="ital">clara.</span></h3>
+
+    <div class="concl">
+      <div class="col" data-reveal="up">
+        <div class="lab">01 · Validación técnica</div>
+        <h4>El pipeline funciona <span class="ital">de extremo a extremo.</span></h4>
+        <p>Descarga, limpieza, análisis y predicción operan con datos reales. Los modelos predictivos son útiles como señal táctica de 1 a 5 días, con intervalos de confianza explícitos a horizontes mayores.</p>
+      </div>
+      <div class="col" data-reveal="up">
+        <div class="lab">02 · Oportunidad de negocio</div>
+        <h4>El 75% del mercado <span class="ital">es educable.</span></h4>
+        <p>Las Ex-Víctimas del Hype son receptivas al posicionamiento educativo de IronClad. El Inversor Híbrido representa el cliente de mayor valor por unidad. Dos estrategias, mismo producto.</p>
+      </div>
+      <div class="concl-quote" data-reveal>
+        «En un mercado lleno de predicciones vacías,<br/><b>nosotros mostramos los datos tal como son.</b>»
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Fase 2 · Conclusiones</span>
+    <span class="num">23 / 24</span>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SLIDE 16 — CLOSING                              -->
+<!-- ============================================== -->
+<section data-slide data-screen-label="16 Cierre" class="closing">
+  <div class="grid-bg"></div>
+  <div class="grain"></div>
+
+  <div class="chrome">
+    <div class="mark"><div class="seal">I</div><span>IronClad Capital</span></div>
+    <div class="pill">Fin · Q&amp;A</div>
+  </div>
+
+  <div class="body">
+    <div class="eyebrow" data-reveal style="margin-bottom: 32px; color: var(--accent-2);">Gracias · Q&amp;A</div>
+    <h1 data-reveal="up" style="font-size: 200px; font-weight: 300; letter-spacing: -0.04em;">Preguntas.</h1>
+    <div class="sub" data-reveal style="margin-top: 40px;">Los datos no mienten, las emociones sí.</div>
+
+    <div class="team-row" data-reveal>
+      <div>
+        <div class="label">Equipo</div>
+        <div class="n" style="margin-top:6px;">José Pablo Aceves · Ignacio del Peso · Adrián Duque</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next">
+    <div class="lab">
+
+
+</div>
+    <div class="v">
+
+
+</div>
+  </div>
+
+  <div class="footer">
+    <span>IronClad Capital · Proyecto de Ingeniería · M11 · Grupo 01</span>
+    <span class="num">24 / 24</span>
+  </div>
+</section>
+
+</deck-stage>
+
+<div class="deck-progress" id="deck-progress"></div>
+
+<script>
+(function() {
+  const stage = document.querySelector('deck-stage');
+  if (!stage) return;
+  const slides = Array.from(document.querySelectorAll('section[data-slide]'));
+  const progress = document.getElementById('deck-progress');
+
+  // Auto-stagger every direct child reveal inside the slide content blocks.
+  // Authors can override with inline style="--d: 400ms".
+  slides.forEach(slide => {
+    const reveals = slide.querySelectorAll('[data-reveal]');
+    reveals.forEach((el, i) => {
+      if (!el.style.getPropertyValue('--d')) {
+        el.style.setProperty('--d', (120 + i * 90) + 'ms');
+      }
+    });
+    const bars = slide.querySelectorAll('[data-bar]');
+    bars.forEach((el, i) => {
+      if (!el.style.getPropertyValue('--d')) {
+        el.style.setProperty('--d', (400 + i * 110) + 'ms');
+      }
+    });
+  });
+
+  // Count-up animation for [data-count]
+  function animateCount(el) {
+    if (el.dataset.counted === '1') return;
+    el.dataset.counted = '1';
+    const target = parseFloat(el.dataset.count);
+    const decimals = (el.dataset.decimals != null) ? +el.dataset.decimals : (Number.isInteger(target) ? 0 : 2);
+    const prefix = el.dataset.prefix || '';
+    const suffix = el.dataset.suffix || '';
+    const dur = +(el.dataset.dur || 1200);
+    const delay = +(el.dataset.delay || 250);
+    const startVal = +(el.dataset.start || 0);
+    const fmt = (v) => {
+      const f = v.toFixed(decimals);
+      // group thousands when no decimals and target >= 1000
+      if (decimals === 0 && Math.abs(target) >= 1000) {
+        return prefix + Number(f).toLocaleString('es-ES') + suffix;
+      }
+      return prefix + f + suffix;
+    };
+    el.textContent = fmt(startVal);
+    const t0 = performance.now() + delay;
+    function step(now) {
+      const t = Math.max(0, now - t0);
+      const p = Math.min(1, t / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(startVal + (target - startVal) * eased);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function resetCount(el) {
+    el.dataset.counted = '0';
+    const startVal = +(el.dataset.start || 0);
+    const decimals = (el.dataset.decimals != null) ? +el.dataset.decimals : (Number.isInteger(parseFloat(el.dataset.count)) ? 0 : 2);
+    const prefix = el.dataset.prefix || '';
+    const suffix = el.dataset.suffix || '';
+    el.textContent = prefix + startVal.toFixed(decimals) + suffix;
+  }
+
+  function activate(idx) {
+    slides.forEach((s, i) => {
+      if (i === idx) {
+        s.setAttribute('data-active','');
+        s.querySelectorAll('[data-count]').forEach(animateCount);
+      } else {
+        s.removeAttribute('data-active');
+        // reset counters so revisit replays
+        s.querySelectorAll('[data-count]').forEach(resetCount);
+      }
+    });
+    if (progress) {
+      const pct = ((idx + 1) / slides.length) * 100;
+      progress.style.width = pct + '%';
+    }
+  }
+
+  // Hook into deck-stage's slideIndexChanged postMessage (it fires on the parent)
+  // and the URL hash since deck-stage stores position in the hash.
+  function getCurrentIdx() {
+    const m = location.hash.match(/(\d+)/);
+    if (m) {
+      const n = Math.max(1, Math.min(slides.length, parseInt(m[1], 10)));
+      return n - 1;
+    }
+    return 0;
+  }
+  // Initial activation (after a tick so deck-stage finishes laying out)
+  setTimeout(() => activate(getCurrentIdx()), 60);
+
+  // Listen for the postMessage deck-stage emits
+  window.addEventListener('message', (e) => {
+    if (e.data && typeof e.data.slideIndexChanged === 'number') {
+      activate(e.data.slideIndexChanged);
+    }
+  });
+  // Also watch hash changes (covers manual nav / reload)
+  window.addEventListener('hashchange', () => activate(getCurrentIdx()));
+  // And keys, just in case
+  window.addEventListener('keyup', () => setTimeout(() => activate(getCurrentIdx()), 30));
+})();
+</script>
+
+</body>
+</html>
