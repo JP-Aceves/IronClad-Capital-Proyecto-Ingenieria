@@ -9,7 +9,7 @@
 
 - Documentación Oficial: https://jp-aceves.github.io/IronClad-Capital-Proyecto-Ingenieria/docs/documentacion.html
 - Documentación Visual: https://jp-aceves.github.io/IronClad-Capital-Proyecto-Ingenieria/docs/
-- Presentación: https://jp-aceves.github.io/IronClad-Capital-Proyecto-Ingenieria/docs/presentacion.html
+- Presentación: https://jp-aceves.github.io/IronClad-Capital-Proyecto-Ingenieria/docs/ppt.html
 - Blog: https://substack.com/@ironcladcapital
 
 ---
