@@ -1,0 +1,1726 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>IronClad Capital — Entrega Final · Proyecto de Ingeniería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1d1d1d;
+    --muted:#666;
+    --line:#d4d4d4;
+    --soft:#f5f5f5;
+    --accent:#222;         /* tinta para acentos: sin azul institucional */
+    --accent-soft:#f0f0f0;
+    --rule:#1d1d1d;        /* rayas estructurales */
+    --warn:#8a3a1a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#e2e2df;color:var(--ink);font-family:"Lexend","Helvetica Neue",Arial,sans-serif;font-size:10.5pt;line-height:1.6;font-weight:400}
+
+  /* Página A4 */
+  .page{
+    width:210mm;
+    min-height:297mm;
+    padding:22mm 20mm 20mm 20mm;
+    margin:8mm auto;
+    background:#fbf9f3;
+    box-shadow:0 2px 14px rgba(0,0,0,.12);
+    position:relative;
+    page-break-after:always;
+    break-after:page;
+  }
+  .page:last-child{page-break-after:auto;break-after:auto}
+
+  /* Logo de cabecera en cada página (excepto portada) */
+  .page .page-logo{
+    position:absolute;top:8mm;right:20mm;
+    height:8mm;width:auto;opacity:.85;
+    pointer-events:none;
+  }
+  .cover .page-logo{display:none}
+
+  /* Cabecera + pie repetidos — sobrios, sin línea */
+  .page::before{
+    content:"IronClad Capital — Entrega Final";
+    position:absolute;top:10mm;left:20mm;
+    font-size:8.5pt;color:#888;letter-spacing:.01em;
+  }
+  .page::after{
+    content:"Universidad Europea de Madrid · Proyecto de Ingeniería";
+    position:absolute;bottom:11mm;left:20mm;right:20mm;
+    font-size:8.5pt;color:#888;
+  }
+  .page-num{position:absolute;bottom:11mm;right:20mm;font-size:8.5pt;color:#888}
+
+  /* Portada — sin cabecera ni pie */
+  .cover::before,.cover::after{display:none}
+  .cover{
+    padding:0;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .cover-inner{padding:28mm 24mm 22mm 24mm;display:flex;flex-direction:column;height:100%;min-height:297mm}
+  .cover .logo{display:block;margin:0 0 6mm -4mm}
+
+  .cover h1{
+    font-size:34pt;line-height:1.1;letter-spacing:-.01em;margin:0 0 4mm 0;font-weight:700;color:var(--ink);
+  }
+  .cover h2{
+    font-size:15pt;font-weight:400;color:#444;margin:0 0 14mm 0;letter-spacing:0;
+  }
+  .cover .lede{font-size:11.5pt;color:#333;max-width:140mm;line-height:1.6}
+  .cover-meta{font-size:11pt;color:#333;margin-top:8mm}
+  .cover-meta .row{display:flex;gap:6mm;padding:2mm 0;border-bottom:.4pt solid #ddd}
+  .cover-meta .row:last-child{border-bottom:none}
+  .cover-meta .k{width:42mm;color:#888;font-weight:500;flex-shrink:0;text-transform:uppercase;font-size:9pt;letter-spacing:.06em;padding-top:1mm}
+  .cover-meta .v{flex:1;line-height:1.55}
+  .cover-foot-rule{height:0;border-top:1pt solid #1d1d1d;margin-top:10mm}
+  .cover-bottom{margin-top:auto;font-size:10pt;color:#666;display:flex;justify-content:space-between;align-items:flex-end}
+
+  /* Tipografía de contenido */
+  h1.section{
+    font-size:18pt;font-weight:700;color:var(--ink);
+    margin:2mm 0 5mm 0;letter-spacing:-.005em;
+    padding-bottom:2.5mm;border-bottom:.8pt solid #1d1d1d;
+  }
+  h2.sub{font-size:12.5pt;font-weight:500;margin:6mm 0 2mm 0;color:var(--ink)}
+  h3.subsub{font-weight:600;margin:5mm 0 1mm 0;color:#333;text-transform:none;letter-spacing:0;font-size:10.5pt}
+  p{margin:0 0 3mm 0;text-align:justify;hyphens:auto}
+  ul,ol{margin:0 0 3mm 0;padding-left:6mm}
+  li{margin:0 0 1.2mm 0;text-align:justify}
+  strong{font-weight:600}
+  em{font-style:italic;color:#333}
+
+  /* Bloque de código */
+  pre.code{
+    background:#f3eee2;border-left:2pt solid #999;
+    padding:3mm 4mm;font-family:"Roboto Mono","Consolas",monospace;
+    font-size:8.5pt;line-height:1.55;color:#222;
+    margin:3mm 0;white-space:pre-wrap;
+  }
+  code{font-family:"Roboto Mono","Consolas",monospace;font-size:9pt;background:#f3eee2;padding:1px 4px;border-radius:2px}
+
+  /* Tablas — estilo académico, sin headers de color */
+  table.data{
+    width:100%;border-collapse:collapse;margin:3mm 0 2mm 0;font-size:9.5pt;
+    border-top:.8pt solid #1d1d1d;border-bottom:.8pt solid #1d1d1d;
+  }
+  table.data caption{
+    caption-side:bottom;text-align:left;font-size:9pt;color:var(--muted);
+    padding-top:2mm;font-style:normal
+  }
+  table.data th, table.data td{
+    border-bottom:.4pt solid #ddd;padding:2mm 2.5mm;text-align:left;vertical-align:top;
+  }
+  table.data thead th{
+    background:transparent;color:#1d1d1d;font-weight:700;font-size:9pt;
+    border-bottom:.6pt solid #1d1d1d;letter-spacing:0;
+  }
+  table.data tbody tr:nth-child(even){background:transparent}
+  table.data tbody tr:last-child td{border-bottom:none}
+  table.data td.num,table.data th.num{text-align:right;font-variant-numeric:tabular-nums}
+  table.data td.center,table.data th.center{text-align:center}
+  table.data tr.highlight{background:#f4f4f4 !important}
+  table.data tr.highlight td{font-weight:500}
+
+  /* Callouts — sobrios, solo regla lateral */
+  .callout{
+    border-left:2pt solid #1d1d1d;
+    padding:1mm 0 1mm 4mm;margin:4mm 0;font-size:10.5pt;
+    background:transparent;
+  }
+  .callout.warn{border-left-color:var(--warn)}
+  .callout h4{margin:0 0 1mm 0;font-size:9.5pt;font-weight:700;color:#1d1d1d;letter-spacing:0;text-transform:none}
+  .callout.warn h4{color:var(--warn)}
+
+  /* Fórmulas */
+  .formula{
+    text-align:center;font-family:"Roboto Mono",Consolas,monospace;
+    font-size:10pt;margin:4mm 0;padding:2mm 0;
+    border-top:.4pt solid #ccc;border-bottom:.4pt solid #ccc;
+  }
+
+  /* Figuras / placeholders */
+  figure{margin:4mm 0;page-break-inside:avoid;break-inside:avoid}
+  figure figcaption{
+    font-size:9pt;color:var(--muted);text-align:left;margin-top:1.5mm;
+  }
+  .figure-box{
+    border:.6pt solid #bbb;background:#fafafa;
+    min-height:60mm;display:flex;align-items:center;justify-content:center;
+    color:#888;font-size:9.5pt;text-align:center;padding:8mm;
+  }
+  .figure-box.platform{min-height:90mm}
+  .figure-box .label{
+    max-width:80%;color:#666;
+  }
+  .figure-box .label strong{color:#444;font-weight:700}
+
+  /* TOC */
+  .toc-row{
+    display:flex;align-items:baseline;gap:3mm;padding:2mm 0;
+    border-bottom:.4pt dotted #d0d0d0;font-size:11pt
+  }
+  .toc-row .n{width:10mm;color:#1d1d1d;font-weight:500;flex-shrink:0;font-variant-numeric:tabular-nums}
+  .toc-row .t{flex:1}
+  .toc-row .p{color:var(--muted);font-variant-numeric:tabular-nums}
+  .toc-section{margin-top:4mm;font-weight:700;font-size:9.5pt;text-transform:uppercase;letter-spacing:.05em;color:#555;padding-bottom:1mm}
+
+  /* Grid 2/3 columnas */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin:3mm 0}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6mm;margin:3mm 0}
+
+  /* Key-figures académicas (substitución de las stat-cards) */
+  .keyfig{display:flex;flex-direction:column;gap:1.5mm;padding:0;border:none;background:transparent;border-top:.4pt solid #ccc;padding-top:2mm}
+  .keyfig .k{font-size:9pt;color:var(--muted);font-weight:400}
+  .keyfig .v{font-size:15pt;font-weight:500;color:#1d1d1d;line-height:1;font-variant-numeric:tabular-nums}
+  .keyfig .d{font-size:9pt;color:var(--muted);line-height:1.4}
+  /* Compatibilidad con el markup anterior */
+  .stat-card{border:none;padding:0;background:transparent;border-top:.4pt solid #ccc;padding-top:2mm}
+  .stat-card .k{font-size:9pt;text-transform:none;letter-spacing:0;color:var(--muted);margin-bottom:1mm;font-weight:400}
+  .stat-card .v{font-size:15pt;font-weight:500;color:#1d1d1d;line-height:1;font-variant-numeric:tabular-nums}
+  .stat-card .d{font-size:9pt;color:var(--muted);margin-top:1mm}
+
+  /* Print */
+  @page{size:A4;margin:0}
+  @media print{
+    html,body{background:#fff}
+    .page{margin:0;box-shadow:none;page-break-after:always}
+    .page:last-child{page-break-after:auto}
+  }
+  /* Pequeños util */
+  .nowrap{white-space:nowrap}
+  .small{font-size:9.5pt;color:var(--muted)}
+  .right{text-align:right}
+  .mt0{margin-top:0}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<section class="page cover" data-screen-label="Portada">
+  <div class="cover-inner">
+    <img src="assets/universidad-europea-logo.png" alt="Universidad Europea" class="logo" style="width:62mm;height:auto">
+
+    <div style="margin-top:4mm;font-size:10.5pt;color:#555">
+      Escuela de Arquitectura, Ingeniería y Diseño<br>
+      Grado en Ingeniería Informática · M11 · Grupo 1
+    </div>
+
+    <div style="margin-top:auto;margin-bottom:auto">
+      <div style="font-size:10.5pt;color:#666;margin-bottom:6mm;letter-spacing:.04em;text-transform:uppercase">Proyecto de Ingeniería · Entrega Final</div>
+      <h1>IronClad Capital</h1>
+      <h2>Plataforma de análisis y segmentación inversora con datos reales</h2>
+      <p class="lede">
+</p>
+
+      <div class="cover-foot-rule"></div>
+      <div class="cover-meta">
+        <div class="row">
+          <div class="k">Autores</div>
+          <div class="v">
+            José Pablo Aceves Palomino<br>
+            Ignacio del Peso Domínguez<br>
+            Adrián Duque Luengo
+          </div>
+        </div>
+        <div class="row">
+          <div class="k">Profesor</div>
+          <div class="v">Gabriel Marín Díaz</div>
+        </div>
+        <div class="row">
+          <div class="k">Asignatura</div>
+          <div class="v">Proyecto de Ingeniería — Curso 2025 / 2026</div>
+        </div>
+        <div class="row">
+          <div class="k">Fecha de entrega</div>
+          <div class="v">19 de mayo de 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÍNDICE ============ -->
+<section class="page" data-screen-label="Índice">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">Índice de contenidos</h1>
+
+  <div class="toc-section">Bloque I — Fundamentos del proyecto</div>
+  <div class="toc-row"><span class="n">1.</span><span class="t">Introducción y contexto del proyecto</span><span class="p">3</span></div>
+  <div class="toc-row"><span class="n">2.</span><span class="t">Planificación, fases y equipo</span><span class="p">5</span></div>
+  <div class="toc-row"><span class="n">3.</span><span class="t">Modelo de casos de uso (UML)</span><span class="p">8</span></div>
+
+  <div class="toc-section">Bloque II — Análisis y modelos</div>
+  <div class="toc-row"><span class="n">4.</span><span class="t">Análisis de datos financieros con Python</span><span class="p">10</span></div>
+  <div class="toc-row"><span class="n">5.</span><span class="t">Predicciones y evaluación del error (MAE)</span><span class="p">12</span></div>
+
+  <div class="toc-section">Bloque III — Clientes y perfiles</div>
+  <div class="toc-row"><span class="n">6.</span><span class="t">Segmentación de clientes</span><span class="p">14</span></div>
+  <div class="toc-row"><span class="n">7.</span><span class="t">Definición e interpretación de los 3 perfiles</span><span class="p">15</span></div>
+
+  <div class="toc-section">Bloque IV — Gestión, riesgos y cierre</div>
+  <div class="toc-row"><span class="n">8.</span><span class="t">Presupuesto del proyecto</span><span class="p">18</span></div>
+  <div class="toc-row"><span class="n">9.</span><span class="t">Advertencias de riesgo y limitaciones</span><span class="p">20</span></div>
+  <div class="toc-row"><span class="n">10.</span><span class="t">Conclusiones y recomendaciones estratégicas</span><span class="p">22</span></div>
+
+  <span class="page-num">2</span>
+</section>
+
+<!-- ============ 1. INTRO ============ -->
+<section class="page" data-screen-label="01 Introducción">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">1. Introducción y contexto del proyecto</h1>
+
+  <h2 class="sub">1.1 Qué es IronClad Capital</h2>
+  <p>
+    IronClad Capital es una plataforma financiera desarrollada por estudiantes de la
+    Universidad Europea de Madrid. La idea central es bastante directa: reunir en un
+    mismo sitio activos digitales (criptomonedas) e instrumentos tradicionales (fondos y
+    acciones), de forma que cualquier tipo de inversor pueda entender qué tiene en
+    cartera y por qué.
+  </p>
+  <p>
+    Para conseguirlo usamos Python con <code>yfinance</code> como motor de datos, lo que
+    nos permite trabajar con precios reales descargados directamente de Yahoo Finance.
+    El resultado es una plataforma orientada a democratizar el análisis: que alguien sin
+    formación financiera pueda ver el comportamiento histórico de sus activos y tomar
+    decisiones con más información encima de la mesa.
+  </p>
+
+  <h2 class="sub">1.2 Marco conceptual: el hombre anumérico</h2>
+  <p>
+    El proyecto se apoya conceptualmente en las ideas expuestas en <em>El hombre
+    anumérico</em>, obra que analiza cómo muchas personas interpretan incorrectamente
+    estadísticas, probabilidades y gráficos por una falta de comprensión numérica
+    crítica. El concepto de <strong>anumerismo</strong> no se refiere únicamente a
+    dificultades con las matemáticas, sino también a un conjunto de tendencias
+    cognitivas concretas que aparecen con frecuencia al consumir información
+    cuantitativa:
+  </p>
+  <ul>
+    <li>Confundir correlación con causalidad.</li>
+    <li>Confiar excesivamente en predicciones numéricas.</li>
+    <li>Ignorar la incertidumbre intrínseca de los modelos.</li>
+    <li>Aceptar gráficos o porcentajes sin contexto suficiente.</li>
+  </ul>
+  <p>
+    En entornos tecnológicos y financieros el problema es especialmente relevante. Un
+    modelo predictivo puede mostrar buenos resultados sobre datos históricos y aun así
+    fallar ante cambios del entorno real. Del mismo modo, un gráfico puede transmitir
+    una sensación de precisión y objetividad que no siempre refleja la complejidad real
+    de los datos que representa. Por este motivo, el marco del hombre anumérico actúa
+    como <strong>base transversal del proyecto</strong>: IronClad Capital no presenta sus
+    resultados como certezas absolutas, sino como estimaciones sujetas a limitaciones,
+    márgenes de error y posibles sesgos. Las advertencias del apartado 9 desarrollan en
+    detalle cada una de estas limitaciones.
+  </p>
+
+  <span class="page-num">3</span>
+</section>
+
+<section class="page" data-screen-label="01b Objetivos y activos">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">1. Introducción <span class="small" style="font-weight:400"></span></h1>
+
+  <h2 class="sub">1.3 Objetivos de esta entrega</h2>
+  <p>
+    La entrega final tiene como objetivo demostrar que el sistema funciona de verdad,
+    con datos reales, y no solo sobre el papel. De forma concreta, hemos trabajado en
+    cuatro frentes:
+  </p>
+  <ul>
+    <li>Descargar y procesar datos históricos de LINK-USD, DOT-USD e ITA usando
+      <code>yfinance</code>.</li>
+    <li>Generar visualizaciones de evolución de precios, rendimientos acumulados y
+      comparación entre activos.</li>
+    <li>Construir un modelo de predicción a 1, 5, 10 y 15 días, evaluado con MAE como
+      métrica de error.</li>
+    <li>Segmentar a los clientes en tres perfiles diferenciados a partir de un dataset
+      real de Kaggle.</li>
+  </ul>
+
+  <h2 class="sub">1.4 Activos seleccionados</h2>
+  <p>
+    Elegimos tres activos con características complementarias para poder cubrir
+    distintos niveles de riesgo dentro de la misma plataforma:
+  </p>
+  <ul>
+    <li><strong>Chainlink (LINK-USD):</strong> protocolo oracle de blockchain. Alta
+      volatilidad, alto potencial de retorno en el segmento DeFi.</li>
+    <li><strong>Polkadot (DOT-USD):</strong> infraestructura de interoperabilidad
+      blockchain. Menor capitalización que Bitcoin pero ecosistema técnico sólido.</li>
+    <li><strong>iShares U.S. Aerospace &amp; Defense ETF (ITA):</strong> fondo cotizado
+      del sector defensa estadounidense. Funciona como ancla de estabilidad institucional
+      en la cartera.</li>
+  </ul>
+
+  <span class="page-num">4</span>
+</section>
+
+<section class="page" data-screen-label="02 Planificación">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">2. Planificación, fases y equipo</h1>
+
+  <h2 class="sub">2.1 Estructura general del proyecto</h2>
+  <p>
+    El proyecto se ha organizado en <strong>tres fases consecutivas</strong> que cubren
+    desde la conceptualización hasta el cierre. Cada fase tiene una entrega oficial
+    asociada y una lista cerrada de trabajos. La planificación se llevó en un tablero
+    Kanban interno, con un calendario alineado a las semanas lectivas y reuniones
+    periódicas con el equipo docente.
+  </p>
+
+  <table class="data">
+    <thead>
+      <tr>
+        <th style="width:9%">Fase</th>
+        <th style="width:26%">Nombre</th>
+        <th style="width:20%">Ventana temporal</th>
+        <th style="width:13%" class="num">Trabajos</th>
+        <th style="width:17%" class="num">Reuniones</th>
+        <th>Entrega oficial</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>F1</strong></td>
+        <td>Diseño y planificación</td>
+        <td>Feb 2026 — Mar 2026</td>
+        <td class="num">7</td>
+        <td class="num">4</td>
+        <td>Entrega 1 · 16 marzo 2026</td>
+      </tr>
+      <tr>
+        <td><strong>F2</strong></td>
+        <td>Construcción técnica</td>
+        <td>Mar 2026 — Abr 2026</td>
+        <td class="num">10</td>
+        <td class="num">2</td>
+        <td>Entrega 2 · 30 abril 2026</td>
+      </tr>
+      <tr>
+        <td><strong>F3</strong></td>
+        <td>Proyecto final</td>
+        <td>May 2026</td>
+        <td class="num">1+</td>
+        <td class="num">1</td>
+        <td>Entrega Final · 19 mayo 2026</td>
+      </tr>
+    </tbody>
+    <caption>Tabla 1. Vista resumen de las tres fases del proyecto.</caption>
+  </table>
+
+  <h2 class="sub">2.2 Cronograma visual</h2>
+  <p>
+    El cronograma siguiente representa de forma compacta la sucesión de fases y los hitos
+    clave. Cada barra horizontal cubre la ventana de trabajo efectivo de la fase; los
+    rombos marcan las tres entregas oficiales.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 720 230" style="width:100%;font-family:inherit;">
+      <!-- ejes -->
+      <line x1="80" y1="40" x2="700" y2="40" stroke="#cfcfcf" stroke-width="0.5"/>
+      <line x1="80" y1="180" x2="700" y2="180" stroke="#cfcfcf" stroke-width="0.5"/>
+      <!-- meses -->
+      <g font-size="9" fill="#888" text-anchor="middle">
+        <text x="120" y="32">Feb 26</text>
+        <text x="240" y="32">Mar 26</text>
+        <text x="380" y="32">Abr 26</text>
+        <text x="520" y="32">May 26</text>
+        <text x="640" y="32">Jun 26</text>
+      </g>
+      <!-- líneas verticales meses -->
+      <g stroke="#eee" stroke-width="0.5">
+        <line x1="120" y1="40" x2="120" y2="180"/>
+        <line x1="240" y1="40" x2="240" y2="180"/>
+        <line x1="380" y1="40" x2="380" y2="180"/>
+        <line x1="520" y1="40" x2="520" y2="180"/>
+        <line x1="640" y1="40" x2="640" y2="180"/>
+      </g>
+
+      <!-- Fase 1 -->
+      <rect x="115" y="55" width="170" height="22" rx="3" fill="#1f3a5f" opacity="0.18"/>
+      <rect x="115" y="55" width="170" height="22" rx="3" fill="none" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="200" y="70" text-anchor="middle" font-size="10" fill="#1f3a5f" font-weight="600">Fase 1 · Diseño y planificación</text>
+
+      <!-- Fase 2 -->
+      <rect x="265" y="95" width="195" height="22" rx="3" fill="#1f3a5f" opacity="0.32"/>
+      <rect x="265" y="95" width="195" height="22" rx="3" fill="none" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="363" y="110" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Fase 2 · Construcción técnica</text>
+
+      <!-- Fase 3 -->
+      <rect x="455" y="135" width="100" height="22" rx="3" fill="#1f3a5f" opacity="0.55"/>
+      <rect x="455" y="135" width="100" height="22" rx="3" fill="none" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="505" y="150" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Fase 3</text>
+
+      <!-- Hitos diamond -->
+      <g fill="#a8521a">
+        <polygon points="250,178 258,170 266,178 258,186"/>
+        <polygon points="450,178 458,170 466,178 458,186"/>
+        <polygon points="560,178 568,170 576,178 568,186"/>
+      </g>
+      <g font-size="8.5" fill="#a8521a" text-anchor="middle">
+        <text x="258" y="208">Entrega 1</text>
+        <text x="258" y="218">16 mar</text>
+        <text x="458" y="208">Entrega 2</text>
+        <text x="458" y="218">30 abr</text>
+        <text x="568" y="208">Entrega Final</text>
+        <text x="568" y="218">19 may</text>
+      </g>
+
+      <!-- Etiqueta lateral -->
+      <text x="40" y="68" font-size="9.5" fill="#555">F1</text>
+      <text x="40" y="108" font-size="9.5" fill="#555">F2</text>
+      <text x="40" y="148" font-size="9.5" fill="#555">F3</text>
+      <text x="40" y="183" font-size="9.5" fill="#555">Hitos</text>
+    </svg>
+    <figcaption>Figura 1. Cronograma de las tres fases del proyecto. Las barras representan la ventana de trabajo efectivo; los rombos, las entregas oficiales.</figcaption>
+  </figure>
+
+  <h2 class="sub">2.3 Trabajos de la Fase 1 — Diseño y planificación</h2>
+  <p>
+    La Fase 1 estableció las bases conceptuales del proyecto: empresa simulada, problema
+    de investigación, activos seleccionados, diseño del sistema, UML y la primera
+    redacción del documento.
+  </p>
+  <table class="data">
+    <thead>
+      <tr><th style="width:6%">#</th><th style="width:35%">Trabajo</th><th style="width:14%">Fecha</th><th>Resultado principal</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1.1</td><td>Definir empresa simulada</td><td>24 feb 2026</td><td>Posicionamiento: educativo, crítico, riguroso</td></tr>
+      <tr><td>1.2</td><td>Selección de activos financieros</td><td>24 feb 2026</td><td>2 cripto (LINK, DOT) + 1 ETF (ITA), justificada</td></tr>
+      <tr><td>1.3</td><td>Definir el problema de investigación</td><td>3 mar 2026</td><td>Hombre anumérico, errores comunes a evitar</td></tr>
+      <tr><td>1.4</td><td>Planificación del proyecto</td><td>5 mar 2026</td><td>Fases, tareas, responsables, Gantt y checkpoints</td></tr>
+      <tr><td>1.5</td><td>Diseño del sistema</td><td>9 mar 2026</td><td>Flujo de datos, análisis, segmentación, blog</td></tr>
+      <tr><td>1.6</td><td>UML — Diagrama de casos de uso</td><td>11 mar 2026</td><td>13 casos de uso, 4 paquetes, 4 actores</td></tr>
+      <tr><td>1.7</td><td>Redacción del documento (Entrega 1)</td><td>14 mar 2026</td><td>Memoria fase 1 lista para entregar</td></tr>
+    </tbody>
+    <caption>Tabla 2. Trabajos de la Fase 1.</caption>
+  </table>
+
+  <span class="page-num">5</span>
+</section>
+
+<section class="page" data-screen-label="02b Trabajos F2 y F3">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">2. Planificación</h1>
+
+  <h2 class="sub">2.4 Trabajos de la Fase 2 — Construcción técnica</h2>
+  <p>
+    La Fase 2 fue la más intensiva en cómputo: descarga real con yfinance, análisis
+    descriptivo del dataset de clientes, segmentación inicial por reglas, primeras
+    predicciones y profesionalización del repositorio en GitHub.
+  </p>
+  <table class="data">
+    <thead>
+      <tr><th style="width:7%">#</th><th style="width:35%">Trabajo</th><th style="width:14%">Fecha</th><th>Resultado principal</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>2.1</td><td>Dataset de clientes (Kaggle)</td><td>24 abr 2026</td><td>12.000 registros, variables clave identificadas</td></tr>
+      <tr><td>2.2</td><td>Análisis descriptivo de clientes</td><td>24 abr 2026</td><td>Estadísticos, distribuciones, tablas resumen</td></tr>
+      <tr><td>2.3</td><td>Segmentación inicial</td><td>24 abr 2026</td><td>3 perfiles definidos y justificados</td></tr>
+      <tr><td>2.4</td><td>Visualización correcta</td><td>25 abr 2026</td><td>Gráficos etiquetados, escalas y leyendas</td></tr>
+      <tr><td>2.5</td><td>Descarga de datos financieros</td><td>25 abr 2026</td><td>Históricos completos con integridad verificada</td></tr>
+      <tr><td>2.6</td><td>Análisis financiero básico</td><td>26 abr 2026</td><td>Precios, rendimientos, volatilidad, comparativa</td></tr>
+      <tr><td>2.7</td><td>Limpieza y preparación</td><td>28 abr 2026</td><td>Sin nulos, fechas alineadas, series coherentes</td></tr>
+      <tr><td>2.8</td><td>Predicciones</td><td>28 abr 2026</td><td>Baseline WMA + regresión lineal con MAE</td></tr>
+      <tr><td>2.9</td><td>GitHub profesionalizado</td><td>28 abr 2026</td><td>README, estructura, ramas y CI básico</td></tr>
+      <tr><td>2.10</td><td>Documentación técnica (Entrega 2)</td><td>30 abr 2026</td><td>Memoria fase 2 entregada</td></tr>
+    </tbody>
+    <caption>Tabla 3. Trabajos de la Fase 2.</caption>
+  </table>
+
+  <h2 class="sub">2.5 Trabajos de la Fase 3 — Proyecto final</h2>
+  <p>
+    La Fase 3 ha consistido en consolidar todo el trabajo previo, ampliarlo con modelos
+    avanzados, validación por clustering, backtesting de carteras, despliegue del
+    prototipo y redacción de esta memoria final.
+  </p>
+  <table class="data">
+    <thead>
+      <tr><th style="width:7%">#</th><th style="width:35%">Trabajo</th><th style="width:14%">Fecha</th><th>Resultado principal</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>3.1</td><td>Revisión de coherencia del proyecto</td><td>26 abr 2026</td><td>Conclusiones que coinciden con los datos</td></tr>
+      <tr><td>3.2</td><td>Modelos avanzados (LSTM, Prophet)</td><td>5 may 2026</td><td>Mejora MAE ~33% y ~17% sobre baseline</td></tr>
+      <tr><td>3.3</td><td>Clustering (K-Means + DBSCAN)</td><td>8 may 2026</td><td>Validación de los 3 perfiles, ARI = 0,61</td></tr>
+      <tr><td>3.4</td><td>Backtesting de carteras</td><td>11 may 2026</td><td>3 carteras simuladas 2023-2026 vs benchmark</td></tr>
+      <tr><td>3.5</td><td>Prototipo desplegado (FastAPI + React)</td><td>15 may 2026</td><td>Plataforma accesible con onboarding y dashboard</td></tr>
+      <tr><td>3.6</td><td>Memoria final + presentación</td><td>19 may 2026</td><td>Documento entrega final + sesión oral</td></tr>
+    </tbody>
+    <caption>Tabla 4. Trabajos de la Fase 3.</caption>
+  </table>
+
+  <h2 class="sub">2.6 Reuniones del equipo</h2>
+  <p>
+    Mantuvimos siete reuniones internas formales además del seguimiento informal diario.
+    Cada reunión cerró con una decisión registrada en el tablero del proyecto.
+  </p>
+  <table class="data">
+    <thead>
+      <tr><th>Reunión</th><th>Fase</th><th>Fecha</th><th>Decisión clave</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Kickoff oficial</td><td>F1</td><td>20 feb 2026</td><td>Empresa simulada, problema preliminar y roles</td></tr>
+      <tr><td>Validación conceptual</td><td>F1</td><td>24 feb 2026</td><td>Activos definitivos y enfoque conceptual</td></tr>
+      <tr><td>Diseño técnico</td><td>F1</td><td>2 mar 2026</td><td>Estructura final del documento + ajustes</td></tr>
+      <tr><td>Integración Fase 1</td><td>F1</td><td>11 mar 2026</td><td>Documento listo para exportar</td></tr>
+      <tr><td>Setup técnico</td><td>F2</td><td>22 abr 2026</td><td>Repo GitHub, dataset y estructura validada</td></tr>
+      <tr><td>Predicciones y segmentación</td><td>F2</td><td>26 abr 2026</td><td>Versión técnica sólida</td></tr>
+      <tr><td>Estructura memoria final</td><td>F3</td><td>29 abr 2026</td><td>Índice y secciones definitivas de la Fase 3</td></tr>
+    </tbody>
+    <caption>Tabla 5. Reuniones formales del equipo.</caption>
+  </table>
+
+  <span class="page-num">6</span>
+</section>
+
+<section class="page" data-screen-label="02c Equipo y roles">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">2. Planificación <span class="small" style="font-weight:400"></span></h1>
+
+  <h2 class="sub">2.7 Equipo y rotación de roles por fase</h2>
+  <p>
+    Para que los tres integrantes del equipo experimentaran responsabilidades distintas a
+    lo largo del curso, diseñamos un sistema de <strong>rotación de roles por fase</strong>.
+    Cada fase tiene un rol principal asignado a cada persona, sin perjuicio de la
+    colaboración cruzada. La rotación quedó documentada en el tablero del proyecto desde
+    el primer día.
+  </p>
+
+  <h3 class="subsub">Fase 1 — Diseño y planificación</h3>
+  <table class="data">
+    <thead>
+      <tr><th style="width:24%">Integrante</th><th style="width:36%">Rol en la fase</th><th>Responsabilidad principal</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>José Pablo Aceves</strong></td>
+        <td>Project Manager &amp; Strategic Lead</td>
+        <td>Dirigir la planificación y consolidar la Entrega 1.</td>
+      </tr>
+      <tr>
+        <td><strong>Adrián Duque</strong></td>
+        <td>Systems Designer &amp; Financial Strategy Analyst</td>
+        <td>Diseñar el sistema del proyecto y definir los activos.</td>
+      </tr>
+      <tr>
+        <td><strong>Ignacio del Peso</strong></td>
+        <td>Market Research &amp; Concept Analyst</td>
+        <td>Definir el problema de investigación y el marco conceptual.</td>
+      </tr>
+    </tbody>
+    <caption>Tabla 6. Roles asignados durante la Fase 1.</caption>
+  </table>
+
+  <h3 class="subsub">Fase 2 — Construcción técnica</h3>
+  <table class="data">
+    <thead>
+      <tr><th style="width:24%">Integrante</th><th style="width:36%">Rol en la fase</th><th>Responsabilidad principal</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Adrián Duque</strong></td>
+        <td>Lead Data Analyst &amp; Quantitative Specialist</td>
+        <td>Desarrollar el análisis financiero completo.</td>
+      </tr>
+      <tr>
+        <td><strong>José Pablo Aceves</strong></td>
+        <td>Customer Analytics &amp; Segmentation Specialist</td>
+        <td>Investigación de mercados y segmentación de clientes.</td>
+      </tr>
+      <tr>
+        <td><strong>Ignacio del Peso</strong></td>
+        <td>Technical Documentation &amp; Integration Manager</td>
+        <td>Convertir el trabajo técnico en un documento profesional.</td>
+      </tr>
+    </tbody>
+    <caption>Tabla 7. Roles asignados durante la Fase 2.</caption>
+  </table>
+
+  <h3 class="subsub">Fase 3 — Proyecto final</h3>
+  <table class="data">
+    <thead>
+      <tr><th style="width:24%">Integrante</th><th style="width:36%">Rol en la fase</th><th>Responsabilidad principal</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Ignacio del Peso</strong></td>
+        <td>Integration Director &amp; Quality Control Lead</td>
+        <td>Supervisar coherencia total y calidad final.</td>
+      </tr>
+      <tr>
+        <td><strong>Adrián Duque</strong></td>
+        <td>Digital Communication &amp; Web Strategy Lead</td>
+        <td>Desarrollar la plataforma web y comunicación digital.</td>
+      </tr>
+      <tr>
+        <td><strong>José Pablo Aceves</strong></td>
+        <td>Financial Strategy &amp; Critical Framework Lead</td>
+        <td>Profundidad conceptual, marco crítico y viabilidad.</td>
+      </tr>
+    </tbody>
+    <caption>Tabla 8. Roles asignados durante la Fase 3.</caption>
+  </table>
+
+  <div class="callout">
+    <h4>Por qué rotar roles</h4>
+    <p style="margin:0">
+      La rotación tiene dos motivos. Primero, formación: cada integrante experimenta tres
+      perfiles distintos (gestión, análisis y comunicación), lo que se acerca a un entorno
+      profesional real. Segundo, robustez del proyecto: ninguna pieza del sistema depende
+      de una sola persona durante todo el curso, reduciendo el riesgo de bloqueo.
+    </p>
+  </div>
+
+  <span class="page-num">7</span>
+</section>
+
+<!-- ============ 3. ARQUITECTURA ============ -->
+
+<section class="page" data-screen-label="03b UML Casos de uso">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">3. Modelo de casos de uso (UML)</h1>
+
+  <h2 class="sub">3.1 Visión general del sistema</h2>
+  <p>
+    Para fijar el alcance funcional del sistema construimos durante la Fase 1 un diagrama
+    de casos de uso UML. El modelo es deliberadamente reducido pero captura las cuatro
+    áreas funcionales que sostienen el producto: <strong>gestión de datos</strong>,
+    <strong>análisis</strong>, <strong>segmentación</strong> y <strong>comunicación</strong>,
+    además del bloque de acceso del cliente. El diagrama se mantiene como contrato
+    funcional a lo largo de las tres fases: las únicas extensiones de la Fase 3 se
+    integran como variaciones de los casos UC3-UC8 (modelos avanzados y clustering),
+    no como casos nuevos.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 720 430" style="width:100%;font-family:inherit">
+      <!-- Definitions -->
+      <defs>
+        <marker id="arrow-uml" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#1f3a5f"/>
+        </marker>
+      </defs>
+
+      <!-- Paquete GESTIÓN DE DATOS -->
+      <rect x="20" y="40" width="150" height="160" rx="4" fill="none" stroke="#1f3a5f" stroke-width="1"/>
+      <rect x="20" y="40" width="80" height="14" fill="#1f3a5f"/>
+      <text x="60" y="51" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">GESTIÓN DE DATOS</text>
+
+      <ellipse cx="95" cy="80" rx="50" ry="20" fill="#eaf0f7" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="95" y="77" text-anchor="middle" font-size="8" fill="#1f3a5f" font-weight="600">UC1</text>
+      <text x="95" y="88" text-anchor="middle" font-size="8" fill="#1f3a5f">Descargar datos</text>
+
+      <ellipse cx="95" cy="135" rx="50" ry="20" fill="#eaf0f7" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="95" y="132" text-anchor="middle" font-size="8" fill="#1f3a5f" font-weight="600">UC2</text>
+      <text x="95" y="143" text-anchor="middle" font-size="8" fill="#1f3a5f">Limpiar y preparar</text>
+
+      <!-- Paquete ANÁLISIS -->
+      <rect x="20" y="220" width="150" height="200" rx="4" fill="none" stroke="#1f3a5f" stroke-width="1"/>
+      <rect x="20" y="220" width="62" height="14" fill="#1f3a5f"/>
+      <text x="51" y="231" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">ANÁLISIS</text>
+
+      <ellipse cx="95" cy="255" rx="55" ry="18" fill="#eaf0f7" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="95" y="253" text-anchor="middle" font-size="7.5" fill="#1f3a5f" font-weight="600">UC3</text>
+      <text x="95" y="262" text-anchor="middle" font-size="7.5" fill="#1f3a5f">Evolución temporal</text>
+
+      <ellipse cx="95" cy="298" rx="55" ry="18" fill="#eaf0f7" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="95" y="296" text-anchor="middle" font-size="7.5" fill="#1f3a5f" font-weight="600">UC4</text>
+      <text x="95" y="305" text-anchor="middle" font-size="7.5" fill="#1f3a5f">Rendimientos y volatilidad</text>
+
+      <ellipse cx="95" cy="341" rx="55" ry="18" fill="#eaf0f7" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="95" y="339" text-anchor="middle" font-size="7.5" fill="#1f3a5f" font-weight="600">UC5</text>
+      <text x="95" y="348" text-anchor="middle" font-size="7.5" fill="#1f3a5f">Comparar activos</text>
+
+      <ellipse cx="95" cy="384" rx="55" ry="18" fill="#eaf0f7" stroke="#1f3a5f" stroke-width="1"/>
+      <text x="95" y="382" text-anchor="middle" font-size="7.5" fill="#1f3a5f" font-weight="600">UC6</text>
+      <text x="95" y="391" text-anchor="middle" font-size="7.5" fill="#1f3a5f">Generar visualizaciones</text>
+
+      <!-- Paquete SEGMENTACIÓN -->
+      <rect x="290" y="40" width="150" height="160" rx="4" fill="none" stroke="#2a6a3e" stroke-width="1"/>
+      <rect x="290" y="40" width="82" height="14" fill="#2a6a3e"/>
+      <text x="331" y="51" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">SEGMENTACIÓN</text>
+
+      <ellipse cx="365" cy="80" rx="50" ry="20" fill="#e8f1ea" stroke="#2a6a3e" stroke-width="1"/>
+      <text x="365" y="77" text-anchor="middle" font-size="8" fill="#2a6a3e" font-weight="600">UC7</text>
+      <text x="365" y="88" text-anchor="middle" font-size="8" fill="#2a6a3e">Segmentar clientes</text>
+
+      <ellipse cx="365" cy="135" rx="55" ry="20" fill="#e8f1ea" stroke="#2a6a3e" stroke-width="1"/>
+      <text x="365" y="132" text-anchor="middle" font-size="8" fill="#2a6a3e" font-weight="600">UC8</text>
+      <text x="365" y="143" text-anchor="middle" font-size="8" fill="#2a6a3e">Definir perfiles (≥3)</text>
+
+      <!-- Paquete COMUNICACIÓN -->
+      <rect x="290" y="220" width="150" height="125" rx="4" fill="none" stroke="#a8521a" stroke-width="1"/>
+      <rect x="290" y="220" width="92" height="14" fill="#a8521a"/>
+      <text x="336" y="231" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">COMUNICACIÓN</text>
+
+      <ellipse cx="365" cy="262" rx="55" ry="20" fill="#faf1ea" stroke="#a8521a" stroke-width="1"/>
+      <text x="365" y="260" text-anchor="middle" font-size="8" fill="#a8521a" font-weight="600">UC9</text>
+      <text x="365" y="270" text-anchor="middle" font-size="8" fill="#a8521a">Redactar informe</text>
+
+      <ellipse cx="365" cy="315" rx="55" ry="20" fill="#faf1ea" stroke="#a8521a" stroke-width="1"/>
+      <text x="365" y="313" text-anchor="middle" font-size="8" fill="#a8521a" font-weight="600">UC10</text>
+      <text x="365" y="323" text-anchor="middle" font-size="8" fill="#a8521a">Publicar entrada blog</text>
+
+      <!-- Paquete ACCESO CLIENTE -->
+      <rect x="540" y="40" width="160" height="225" rx="4" fill="none" stroke="#2a6a3e" stroke-width="1"/>
+      <rect x="540" y="40" width="92" height="14" fill="#2a6a3e"/>
+      <text x="586" y="51" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">ACCESO CLIENTE</text>
+
+      <ellipse cx="620" cy="80" rx="55" ry="20" fill="#e8f1ea" stroke="#2a6a3e" stroke-width="1"/>
+      <text x="620" y="77" text-anchor="middle" font-size="8" fill="#2a6a3e" font-weight="600">UC11</text>
+      <text x="620" y="88" text-anchor="middle" font-size="8" fill="#2a6a3e">Consultar análisis</text>
+
+      <ellipse cx="620" cy="140" rx="55" ry="20" fill="#e8f1ea" stroke="#2a6a3e" stroke-width="1"/>
+      <text x="620" y="137" text-anchor="middle" font-size="8" fill="#2a6a3e" font-weight="600">UC12</text>
+      <text x="620" y="148" text-anchor="middle" font-size="8" fill="#2a6a3e">Leer blog financiero</text>
+
+      <ellipse cx="620" cy="210" rx="60" ry="22" fill="#e8f1ea" stroke="#2a6a3e" stroke-width="1"/>
+      <text x="620" y="207" text-anchor="middle" font-size="8" fill="#2a6a3e" font-weight="600">UC13</text>
+      <text x="620" y="218" text-anchor="middle" font-size="8" fill="#2a6a3e">Solicitar informe pers.</text>
+
+      <!-- Actor Analista Financiero (principal) -->
+      <g transform="translate(220,230)">
+        <circle cx="0" cy="0" r="7" fill="none" stroke="#1f3a5f" stroke-width="1.4"/>
+        <line x1="0" y1="7" x2="0" y2="28" stroke="#1f3a5f" stroke-width="1.4"/>
+        <line x1="-10" y1="15" x2="10" y2="15" stroke="#1f3a5f" stroke-width="1.4"/>
+        <line x1="0" y1="28" x2="-8" y2="42" stroke="#1f3a5f" stroke-width="1.4"/>
+        <line x1="0" y1="28" x2="8" y2="42" stroke="#1f3a5f" stroke-width="1.4"/>
+        <text x="0" y="58" text-anchor="middle" font-size="8" fill="#1f3a5f" font-weight="600">Analista</text>
+        <text x="0" y="68" text-anchor="middle" font-size="8" fill="#1f3a5f" font-weight="600">Financiero</text>
+        <text x="0" y="78" text-anchor="middle" font-size="7" fill="#888" font-style="italic">«principal»</text>
+      </g>
+
+      <!-- Actor Cliente / Usuario (principal) -->
+      <g transform="translate(485,265)">
+        <circle cx="0" cy="0" r="7" fill="none" stroke="#2a6a3e" stroke-width="1.4"/>
+        <line x1="0" y1="7" x2="0" y2="28" stroke="#2a6a3e" stroke-width="1.4"/>
+        <line x1="-10" y1="15" x2="10" y2="15" stroke="#2a6a3e" stroke-width="1.4"/>
+        <line x1="0" y1="28" x2="-8" y2="42" stroke="#2a6a3e" stroke-width="1.4"/>
+        <line x1="0" y1="28" x2="8" y2="42" stroke="#2a6a3e" stroke-width="1.4"/>
+        <text x="0" y="58" text-anchor="middle" font-size="8" fill="#2a6a3e" font-weight="600">Cliente /</text>
+        <text x="0" y="68" text-anchor="middle" font-size="8" fill="#2a6a3e" font-weight="600">Usuario</text>
+        <text x="0" y="78" text-anchor="middle" font-size="7" fill="#888" font-style="italic">«principal»</text>
+      </g>
+
+      <!-- Actor Sistema yfinance (externo) -->
+      <g transform="translate(220,80)">
+        <circle cx="0" cy="0" r="6" fill="none" stroke="#7c3aed" stroke-width="1.2"/>
+        <line x1="0" y1="6" x2="0" y2="22" stroke="#7c3aed" stroke-width="1.2"/>
+        <line x1="-8" y1="13" x2="8" y2="13" stroke="#7c3aed" stroke-width="1.2"/>
+        <line x1="0" y1="22" x2="-6" y2="33" stroke="#7c3aed" stroke-width="1.2"/>
+        <line x1="0" y1="22" x2="6" y2="33" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="0" y="46" text-anchor="middle" font-size="8" fill="#7c3aed" font-weight="600">yfinance</text>
+        <text x="0" y="56" text-anchor="middle" font-size="7" fill="#888" font-style="italic">«externo»</text>
+      </g>
+
+      <!-- Actor Plataforma Web (externo) -->
+      <g transform="translate(485,380)">
+        <circle cx="0" cy="0" r="6" fill="none" stroke="#a8521a" stroke-width="1.2"/>
+        <line x1="0" y1="6" x2="0" y2="22" stroke="#a8521a" stroke-width="1.2"/>
+        <line x1="-8" y1="13" x2="8" y2="13" stroke="#a8521a" stroke-width="1.2"/>
+        <line x1="0" y1="22" x2="-6" y2="33" stroke="#a8521a" stroke-width="1.2"/>
+        <line x1="0" y1="22" x2="6" y2="33" stroke="#a8521a" stroke-width="1.2"/>
+        <text x="0" y="46" text-anchor="middle" font-size="8" fill="#a8521a" font-weight="600">Plataforma</text>
+        <text x="0" y="56" text-anchor="middle" font-size="7" fill="#888" font-style="italic">«externo»</text>
+      </g>
+
+      <!-- Conexiones Analista → casos -->
+      <g stroke="#1f3a5f" stroke-width="0.7" fill="none">
+        <line x1="220" y1="240" x2="150" y2="80"/>
+        <line x1="220" y1="240" x2="150" y2="135"/>
+        <line x1="220" y1="245" x2="150" y2="255"/>
+        <line x1="220" y1="250" x2="150" y2="298"/>
+        <line x1="220" y1="255" x2="150" y2="341"/>
+        <line x1="220" y1="260" x2="150" y2="384"/>
+        <line x1="220" y1="230" x2="315" y2="80"/>
+        <line x1="220" y1="235" x2="310" y2="135"/>
+        <line x1="220" y1="245" x2="310" y2="262"/>
+        <line x1="220" y1="250" x2="310" y2="315"/>
+      </g>
+
+      <!-- Conexiones Cliente → casos -->
+      <g stroke="#2a6a3e" stroke-width="0.7" fill="none">
+        <line x1="485" y1="270" x2="565" y2="85"/>
+        <line x1="485" y1="270" x2="565" y2="140"/>
+        <line x1="485" y1="270" x2="560" y2="210"/>
+      </g>
+
+      <!-- yfinance → UC1 -->
+      <line x1="220" y1="85" x2="145" y2="80" stroke="#7c3aed" stroke-width="0.7"/>
+
+      <!-- Plataforma → UC10, UC11, UC12, UC13 -->
+      <g stroke="#a8521a" stroke-width="0.7" stroke-dasharray="3,2" fill="none">
+        <line x1="485" y1="385" x2="420" y2="315"/>
+        <line x1="485" y1="385" x2="560" y2="90"/>
+        <line x1="485" y1="385" x2="560" y2="150"/>
+        <line x1="485" y1="385" x2="560" y2="220"/>
+      </g>
+
+      <!-- Include dotted lines UC1→UC2, UC7→UC8, UC9→UC10 -->
+      <g stroke="#1f3a5f" stroke-width="0.6" stroke-dasharray="2,2" fill="none">
+        <line x1="95" y1="100" x2="95" y2="115"/>
+        <line x1="365" y1="100" x2="365" y2="115"/>
+      </g>
+    </svg>
+    <figcaption>Figura 2. Diagrama UML de casos de uso de IronClad Capital. Cuatro paquetes funcionales, dos actores principales (Analista y Cliente) y dos actores externos (yfinance y Plataforma Web).</figcaption>
+  </figure>
+
+  <span class="page-num">8</span>
+</section>
+
+<section class="page" data-screen-label="03c Detalle casos de uso">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">3. Casos de uso <span class="small" style="font-weight:400"></span></h1>
+
+  <h2 class="sub">3.2 Actores del sistema</h2>
+  <table class="data">
+    <thead>
+      <tr><th style="width:24%">Actor</th><th style="width:14%">Tipo</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Analista Financiero</strong></td>
+        <td>Principal</td>
+        <td>Responsable interno de IronClad Capital. Ejecuta los flujos de descarga, análisis y segmentación, y produce los informes que consume el cliente.</td>
+      </tr>
+      <tr>
+        <td><strong>Cliente / Usuario</strong></td>
+        <td>Principal</td>
+        <td>Usuario final de la plataforma. Consulta análisis, lee el blog y puede solicitar informes personalizados ajustados a su perfil.</td>
+      </tr>
+      <tr>
+        <td><strong>Sistema yfinance</strong></td>
+        <td>Externo</td>
+        <td>Fuente de datos financieros vía Yahoo Finance. Alimenta el caso UC1.</td>
+      </tr>
+      <tr>
+        <td><strong>Plataforma Web</strong></td>
+        <td>Externo</td>
+        <td>Capa pública de IronClad Capital. Sirve los casos de comunicación (UC9, UC10) y los casos de acceso del cliente (UC11–UC13).</td>
+      </tr>
+    </tbody>
+    <caption>Tabla 9. Actores del modelo UML.</caption>
+  </table>
+
+  <h2 class="sub">3.3 Catálogo de casos de uso</h2>
+  <table class="data">
+    <thead>
+      <tr><th style="width:9%">ID</th><th style="width:14%">Paquete</th><th style="width:30%">Caso de uso</th><th>Resultado esperado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>UC1</strong></td><td>Gestión de datos</td><td>Descargar datos financieros</td><td>Histórico OHLCV de los tres activos en DataFrame.</td></tr>
+      <tr><td><strong>UC2</strong></td><td>Gestión de datos</td><td>Limpiar y preparar datos</td><td>Series sin huecos, fechas alineadas en UTC, rendimientos calculados.</td></tr>
+      <tr><td><strong>UC3</strong></td><td>Análisis</td><td>Analizar evolución temporal del precio</td><td>Gráfico base 100 y tendencias por activo.</td></tr>
+      <tr><td><strong>UC4</strong></td><td>Análisis</td><td>Calcular rendimientos y volatilidad</td><td>Métricas anualizadas y volatilidad rodante.</td></tr>
+      <tr><td><strong>UC5</strong></td><td>Análisis</td><td>Comparar activos financieros</td><td>Tabla con Sharpe, Sortino, drawdown y correlaciones.</td></tr>
+      <tr><td><strong>UC6</strong></td><td>Análisis</td><td>Generar visualizaciones</td><td>Gráficos comparados, heatmap de correlaciones y radar.</td></tr>
+      <tr><td><strong>UC7</strong></td><td>Segmentación</td><td>Segmentar clientes</td><td>Dataset clasificado en grupos coherentes.</td></tr>
+      <tr><td><strong>UC8</strong></td><td>Segmentación</td><td>Definir perfiles de cliente (≥3)</td><td>Tres perfiles documentados con criterios explícitos.</td></tr>
+      <tr><td><strong>UC9</strong></td><td>Comunicación</td><td>Redactar informe técnico</td><td>Informe en formato memoria con datos y métricas.</td></tr>
+      <tr><td><strong>UC10</strong></td><td>Comunicación</td><td>Publicar entrada de blog</td><td>Contenido divulgativo publicado en la plataforma.</td></tr>
+      <tr><td><strong>UC11</strong></td><td>Acceso cliente</td><td>Consultar análisis financiero</td><td>Dashboard con cartera y predicciones.</td></tr>
+      <tr><td><strong>UC12</strong></td><td>Acceso cliente</td><td>Leer blog financiero</td><td>Acceso a artículos publicados.</td></tr>
+      <tr><td><strong>UC13</strong></td><td>Acceso cliente</td><td>Solicitar informe personalizado</td><td>Petición registrada y entregada al analista.</td></tr>
+    </tbody>
+    <caption>Tabla 10. Catálogo completo de los 13 casos de uso.</caption>
+  </table>
+
+  <h2 class="sub">3.4 Relaciones relevantes</h2>
+  <ul>
+    <li><strong>UC1 → UC2 (include).</strong> No tiene sentido analizar datos sin antes
+      limpiarlos. La limpieza es un paso obligatorio.</li>
+    <li><strong>UC7 → UC8 (include).</strong> Segmentar es la operación; definir perfiles
+      es la consecuencia. UC8 siempre se ejecuta tras UC7.</li>
+    <li><strong>UC9 → UC10 (extend).</strong> Una entrada de blog puede extender un
+      informe técnico, simplificándolo para audiencia no especializada, pero el blog no
+      depende del informe en sentido fuerte.</li>
+    <li><strong>UC13 → UC9 (trigger).</strong> Una solicitud de informe personalizado por
+      parte de un cliente dispara la redacción del informe correspondiente por parte del
+      analista.</li>
+  </ul>
+
+  <span class="page-num">9</span>
+</section>
+
+<!-- ============ 5. DATOS FINANCIEROS ============ -->
+
+<!-- ============ 4. ANÁLISIS FINANCIERO ============ -->
+<section class="page" data-screen-label="04 Análisis financiero">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">4. Análisis de datos financieros con Python</h1>
+
+  <h2 class="sub">4.1 Descarga y preparación de datos</h2>
+  <p>
+    Para la descarga de datos usamos <code>yfinance</code>, una librería de Python que
+    conecta con Yahoo Finance y devuelve los datos en formato DataFrame. De cada activo
+    obtuvimos precio de apertura, cierre ajustado, máximo, mínimo y volumen, con
+    granularidad diaria.
+  </p>
+  <p>
+    Una vez descargados, limpiamos el dataset: revisamos que no hubiera huecos (no había
+    ninguno), unificamos fechas en UTC, calculamos los rendimientos diarios en formato
+    logarítmico y juntamos los tres activos en un único DataFrame para facilitar la
+    comparación.
+  </p>
+  <pre class="code">import yfinance as yf
+tickers = ['LINK-USD', 'DOT-USD', 'ITA']
+data = yf.download(tickers, start='2023-01-01', end='2026-04-20')
+prices = data['Close'].dropna()
+returns = prices.pct_change().dropna()</pre>
+
+  <h2 class="sub">4.2 Evolución de precios</h2>
+  <p>
+    Al analizar las series temporales de los tres activos lo primero que salta a la
+    vista son las diferencias en volatilidad. <strong>LINK-USD</strong> puede moverse
+    más de un 8% en una sola sesión. <strong>DOT-USD</strong> sigue una trayectoria
+    similar a LINK pero con oscilaciones menos pronunciadas. <strong>ITA</strong>, en
+    cambio, muestra una tendencia alcista sostenida y suave, lo que es habitual en ETF
+    de sectores con respaldo gubernamental.
+  </p>
+  <p>
+    Durante el periodo analizado (enero 2023 – abril 2026) los activos cripto pasaron
+    por el ciclo alcista post-FTX de 2023 y por el impacto de la aprobación de ETF de
+    Bitcoin spot en enero de 2024. ITA, por su parte, se benefició del incremento del
+    gasto en defensa de los países OTAN.
+  </p>
+
+  <h2 class="sub">4.3 Rendimientos acumulados</h2>
+  <p>
+    Para comparar los tres activos en pie de igualdad usamos una base 100, calculando
+    los rendimientos logarítmicos acumulados. Esto elimina el problema de escala: LINK
+    cotiza entre $5 y $20, ITA entre $100 y $140, y comparar los precios absolutos no
+    tendría mucho sentido.
+  </p>
+  <p>La fórmula aplicada es la estándar en análisis de carteras institucionales:</p>
+  <div class="formula">R_acum(t) = Σ ln(P_t / P_t-1)  →  Índice(t) = 100 · e^(R_acum(t))</div>
+
+  <span class="page-num">10</span>
+</section>
+
+<section class="page" data-screen-label="04b Comparación activos">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">4. Análisis financiero</h1>
+
+  <h2 class="sub">4.4 Comparación entre activos</h2>
+  <p>
+    Calculamos las métricas de riesgo-retorno habituales: volatilidad anualizada
+    (desviación típica de rendimientos diarios × √252), Sharpe Ratio y drawdown máximo.
+    Los resultados se resumen en la tabla siguiente.
+  </p>
+
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Métrica</th>
+        <th class="num">LINK-USD</th>
+        <th class="num">DOT-USD</th>
+        <th class="num">ITA</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Volatilidad anualizada</td><td class="num">~82%</td><td class="num">~75%</td><td class="num">~18%</td></tr>
+      <tr><td>Retorno acumulado (3 a)</td><td class="num">+187%</td><td class="num">+134%</td><td class="num">+62%</td></tr>
+      <tr><td>Drawdown máximo</td><td class="num">−68%</td><td class="num">−72%</td><td class="num">−12%</td></tr>
+      <tr><td>Sharpe Ratio</td><td class="num">0,89</td><td class="num">0,71</td><td class="num">1,43</td></tr>
+      <tr><td>Correlación con LINK</td><td class="num">1,00</td><td class="num">+0,71</td><td class="num">−0,08</td></tr>
+    </tbody>
+    <caption>Tabla 15. Métricas de riesgo-retorno de los tres activos (periodo 2023-2026).</caption>
+  </table>
+
+  <p>
+    El dato más relevante es el <strong>Sharpe Ratio de ITA (1,43)</strong>, que supera
+    al de los dos activos cripto. Esto confirma que, ajustado por el riesgo asumido, el
+    ETF de defensa ofrece mejor compensación por unidad de volatilidad. El resultado es
+    coherente con la teoría de cartera moderna de Markowitz y justifica su papel como
+    ancla de estabilidad en los tres perfiles de cliente definidos más adelante.
+  </p>
+
+  <span class="page-num">11</span>
+</section>
+
+<!-- ============ 5. PREDICCIONES MAE ============ -->
+<section class="page" data-screen-label="05 Predicciones MAE">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">5. Predicciones y evaluación del error (MAE)</h1>
+
+  <h2 class="sub">5.1 Metodología</h2>
+  <p>
+    Para generar las predicciones combinamos un modelo de media móvil ponderada (WMA)
+    con una regresión lineal simple sobre la serie de precios con ventana deslizante.
+    La métrica de evaluación principal es el <strong>Error Absoluto Medio (MAE)</strong>,
+    que mide en la misma unidad que el activo (dólares) la desviación promedio entre el
+    precio predicho y el precio real:
+  </p>
+  <div class="formula">MAE = (1/n) · Σ |y_predicho(i) − y_real(i)|</div>
+  <p>
+    Elegimos MAE sobre RMSE porque no penaliza de forma desproporcionada los errores
+    grandes, lo que lo hace más interpretable para el usuario final. Un MAE de 0,41 USD
+    en LINK-USD a un día significa que, en promedio, la predicción se desvía menos de
+    medio dólar del precio real, algo perfectamente asumible para una estrategia de
+    medio plazo.
+  </p>
+
+  <h2 class="sub">5.2 Resultados por horizonte temporal</h2>
+
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Horizonte</th>
+        <th class="num">MAE LINK (USD)</th>
+        <th class="num">MAE DOT (USD)</th>
+        <th class="num">MAE ITA (USD)</th>
+        <th>Fiabilidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1 día</td><td class="num">0,41</td><td class="num">0,12</td><td class="num">0,58</td><td>★★★★★ Muy alta</td></tr>
+      <tr><td>5 días</td><td class="num">1,87</td><td class="num">0,54</td><td class="num">2,31</td><td>★★★★☆ Alta</td></tr>
+      <tr><td>10 días</td><td class="num">3,94</td><td class="num">1,18</td><td class="num">4,72</td><td>★★★☆☆ Media</td></tr>
+      <tr><td>15 días</td><td class="num">6,23</td><td class="num">1,84</td><td class="num">7,45</td><td>★★☆☆☆ Limitada</td></tr>
+    </tbody>
+    <caption>Tabla 16. MAE por activo y horizonte de predicción (modelo WMA + regresión lineal).</caption>
+  </table>
+
+  <span class="page-num">12</span>
+</section>
+
+<section class="page" data-screen-label="05b MAE crecimiento">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">5. Predicciones y MAE</h1>
+
+  <h2 class="sub">5.3 Por qué el error crece con el horizonte</h2>
+  <p>
+    El incremento del error al alejarnos en el tiempo no es un fallo del modelo, sino
+    una propiedad intrínseca de los mercados financieros. Hay tres razones que lo
+    explican:
+  </p>
+  <ul>
+    <li><strong>Los errores se acumulan.</strong> Cada predicción se construye sobre la
+      anterior. Si el error del día 1 es pequeño, ese error arrastra al día 2, y así
+      sucesivamente. Cuanto más lejos miramos, más se amplifica.</li>
+    <li><strong>Ocurren cosas que nadie puede anticipar.</strong> A mayor horizonte, más
+      probabilidad de que algún evento externo — una subida de tipos, un hackeo a un
+      exchange, un conflicto geopolítico — cambie el escenario de golpe. El modelo no
+      puede ver lo que no estaba en los datos históricos.</li>
+    <li><strong>El mercado cambia de régimen.</strong> El cripto no se comporta igual en
+      una racha alcista que en una bajista. Si el mercado entra en una fase que el
+      modelo no ha visto antes, lo que aprendió del pasado deja de ser útil.</li>
+  </ul>
+
+  <h2 class="sub">5.4 Qué implica esto para IronClad Capital</h2>
+  <p>
+    Estos resultados tienen dos implicaciones directas para el producto:
+  </p>
+  <ul>
+    <li>Las <strong>predicciones a 1-5 días</strong> son operativamente útiles y pueden
+      ofrecerse como señal de trading táctica para los perfiles con mayor tolerancia al
+      riesgo (Inversor Híbrido).</li>
+    <li>Las <strong>predicciones a 10-15 días</strong> deben comunicarse siempre con
+      intervalos de confianza explícitos. El MAE a 15 días se multiplica por 15 respecto
+      al de 1 día, lo que exige una gestión de expectativas muy clara con el usuario.
+    </li>
+  </ul>
+  <p>
+    Ser transparentes con el error es uno de los diferenciadores de IronClad Capital
+    frente a plataformas que muestran predicciones sin cuantificar su incertidumbre.
+    Los datos no mienten; las emociones, sí.
+  </p>
+
+  <span class="page-num">13</span>
+</section>
+
+<!-- ============ 6. SEGMENTACIÓN ============ -->
+<section class="page" data-screen-label="06 Segmentación">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">6. Segmentación de clientes</h1>
+
+  <h2 class="sub">6.1 Dataset seleccionado</h2>
+  <p>
+    Para la segmentación usamos el <em>Finance Trends &amp; Behaviour Dataset</em>,
+    disponible públicamente en Kaggle. Lo elegimos por tres razones concretas:
+  </p>
+  <ul>
+    <li><strong>Es temáticamente relevante:</strong> recoge variables directamente
+      ligadas al comportamiento inversor (factor de decisión, objetivo financiero,
+      horizonte temporal, fuente de información).</li>
+    <li><strong>Tiene un tamaño suficiente:</strong> 12.000 registros completos tras la
+      limpieza, lo que da significancia estadística a la segmentación.</li>
+    <li><strong>Combina variables categóricas y continuas:</strong> género, objetivo y
+      fuente de información conviven con edad, ingresos y experiencia, lo que permite
+      una segmentación multidimensional.</li>
+  </ul>
+
+  <h2 class="sub">6.2 Exploración inicial</h2>
+  <table class="data">
+    <thead>
+      <tr><th>Variable</th><th>Distribución</th><th>Relevancia</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Género</td><td>62,4% Hombre / 37,6% Mujer</td><td>Media</td></tr>
+      <tr><td>Edad</td><td>18-38 años, media 27,8</td><td>Alta</td></tr>
+      <tr><td>Factor decisión</td><td>Returns 62%, Risk 36%</td><td>Alta</td></tr>
+      <tr><td>Objetivo financiero</td><td>Capital Appre. 65%, Growth 28%</td><td>Alta</td></tr>
+      <tr><td>Propósito</td><td>Wealth Creation 80%, Savings 15%</td><td>Media</td></tr>
+      <tr><td>Horizonte inversión</td><td>Distribuido uniforme 1-5 años</td><td>Alta</td></tr>
+      <tr><td>Fuente de información</td><td>Consultores Fin. 40%, Prensa 35%</td><td>Media</td></tr>
+      <tr><td>Rentabilidad esperada</td><td>10-40%, distribución uniforme</td><td>Alta</td></tr>
+    </tbody>
+    <caption>Tabla 17. Variables del dataset y su relevancia para la segmentación.</caption>
+  </table>
+
+  <h2 class="sub">6.3 Limpieza y enriquecimiento</h2>
+  <p>
+    El dataset original no incluía algunas variables clave para la segmentación, así que
+    las derivamos a partir de las existentes:
+  </p>
+  <ul>
+    <li><strong>Tolerancia al riesgo:</strong> derivada del campo Factor. Risk → 0,25;
+      Growth → 0,55; Returns → 0,70. Se añadió ruido aleatorio pequeño para evitar
+      valores exactamente iguales en masa.</li>
+    <li><strong>Ingresos anuales:</strong> generados con distribución normal centrada en
+      55.000 € (σ = 20.000 €), acotados entre 15.000 y 200.000 €. Los rangos se
+      calibraron con referencias salariales reales del sector.</li>
+    <li><strong>Experiencia en años:</strong> uniforme entre 0 y 20 años, coherente con
+      el rango de edades del dataset.</li>
+    <li><strong>Porcentaje en crypto:</strong> uniforme entre 5% y 70%, para cubrir
+      desde inversores con exposición mínima hasta los que concentran una parte
+      importante de su cartera en activos digitales.</li>
+  </ul>
+
+  <span class="page-num">14</span>
+</section>
+
+<!-- ============ 7. PERFILES ============ -->
+<section class="page" data-screen-label="07 Perfiles">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">7. Definición e interpretación de los 3 perfiles</h1>
+
+  <h2 class="sub">7.1 Metodología de segmentación</h2>
+  <p>
+    La segmentación se realizó mediante reglas basadas en percentiles calculados
+    dinámicamente sobre el dataset real. No usamos umbrales fijos porque eso haría la
+    segmentación frágil ante cambios en la composición de los datos. Con percentiles, la
+    distribución entre perfiles se mantiene estable aunque el dataset evolucione.
+  </p>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Criterio</th>
+        <th>Inversor Híbrido</th>
+        <th>Riesgo Controlado</th>
+        <th>Ex-Víctima del Hype</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Experiencia</td><td>≥ mediana (10 años)</td><td>≥ mediana (10 años)</td><td>&lt; mediana (10 años)</td></tr>
+      <tr><td>Tolerancia riesgo</td><td>≥ 0,50 (alta)</td><td>&lt; 0,50 (baja)</td><td>cualquier valor</td></tr>
+      <tr><td>Ingresos</td><td>≥ mediana (~55k€)</td><td>≥ mediana (~55k€)</td><td>&lt; mediana (~55k€)</td></tr>
+    </tbody>
+    <caption>Tabla 18. Criterios de asignación de perfil.</caption>
+  </table>
+
+  <h2 class="sub">7.2 Distribución resultante</h2>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Perfil</th>
+        <th class="num">Nº Clientes</th>
+        <th class="num">% del Total</th>
+        <th>Prioridad de negocio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Ex-Víctima del Hype</td><td class="num">8.983</td><td class="num">74,9%</td><td>Máxima (volumen)</td></tr>
+      <tr><td>Inversor Híbrido</td><td class="num">1.884</td><td class="num">15,7%</td><td>Alta (valor)</td></tr>
+      <tr><td>Riesgo Controlado</td><td class="num">1.133</td><td class="num">9,4%</td><td>Media (estabilidad)</td></tr>
+    </tbody>
+    <caption>Tabla 19. Distribución de clientes por perfil en el dataset Kaggle.</caption>
+  </table>
+
+  <span class="page-num">15</span>
+</section>
+
+<section class="page" data-screen-label="07b Comparativa perfiles">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">7. Los 3 perfiles</h1>
+
+  <h2 class="sub">7.3 Comparativa estadística de los 3 perfiles</h2>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Variable</th>
+        <th>Ex-Víctima del Hype</th>
+        <th>Inversor Híbrido</th>
+        <th>Riesgo Controlado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Nº clientes</td><td>8.983 (74,9%)</td><td>1.884 (15,7%)</td><td>1.133 (9,4%)</td></tr>
+      <tr><td>Edad media</td><td>27,8 años</td><td>28,0 años</td><td>27,6 años</td></tr>
+      <tr><td>Ingresos anuales</td><td>49.791 €</td><td>70.981 €</td><td>70.408 €</td></tr>
+      <tr><td>Experiencia</td><td>7,9 años</td><td>14,5 años</td><td>14,4 años</td></tr>
+      <tr><td>Tolerancia riesgo</td><td>0,53 (moderada)</td><td>0,70 (alta)</td><td>0,26 (baja)</td></tr>
+      <tr><td>Uso plataformas</td><td>5,1 apps/sem</td><td>5,0 apps/sem</td><td>4,9 apps/sem</td></tr>
+      <tr><td>% en Crypto</td><td>37,7%</td><td>37,3%</td><td>37,3%</td></tr>
+      <tr><td>Factor principal</td><td>Returns</td><td>Returns</td><td>Risk</td></tr>
+      <tr><td>Objetivo</td><td>Capital Appre.</td><td>Capital Appre.</td><td>Growth</td></tr>
+      <tr><td>Fuente info</td><td>Consultores Fin.</td><td>Consultores Fin.</td><td>Consultores Fin.</td></tr>
+    </tbody>
+    <caption>Tabla 20. Comparativa estadística detallada de los 3 perfiles.</caption>
+  </table>
+
+  <span class="page-num">16</span>
+</section>
+
+<section class="page" data-screen-label="07c Carteras y análisis">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">7. Los 3 perfiles</h1>
+
+  <h2 class="sub">7.4 Carteras recomendadas por perfil</h2>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Perfil</th>
+        <th class="num">LINK (Chainlink)</th>
+        <th class="num">DOT (Polkadot)</th>
+        <th class="num">ITA (ETF Defensa)</th>
+        <th>Razonamiento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Inversor Híbrido</td><td class="num">40%</td><td class="num">25%</td><td class="num">35%</td><td>Equilibrio retorno digital + estabilidad</td></tr>
+      <tr><td>Riesgo Controlado</td><td class="num">10%</td><td class="num">20%</td><td class="num">70%</td><td>Ancla institucional, exposición mínima crypto</td></tr>
+      <tr><td>Ex-Víctima del Hype</td><td class="num">30%</td><td class="num">10%</td><td class="num">60%</td><td>Educación financiera + protección activa</td></tr>
+    </tbody>
+    <caption>Tabla 21. Composición de cartera sugerida por perfil.</caption>
+  </table>
+
+  <h2 class="sub">7.5 Análisis comparado de los 3 perfiles</h2>
+  <p>
+    Las distribuciones por perfil muestran que las diferencias más claras entre grupos
+    se concentran en <strong>ingresos anuales y experiencia</strong>. Inversor Híbrido y
+    Riesgo Controlado forman un bloque bien separado de Ex-Víctima del Hype en estas
+    dos dimensiones. La tolerancia al riesgo separa verticalmente a los dos primeros
+    perfiles entre sí.
+  </p>
+  <p>
+    La edad y el uso de plataformas digitales, en cambio, presentan distribuciones
+    solapadas, lo que confirma que no son variables con alto poder discriminante para
+    esta segmentación. El cruce de las tres variables principales (ingresos,
+    experiencia y tolerancia) da una lectura conjunta: el <strong>Inversor Híbrido</strong>
+    domina en ingresos, experiencia y tolerancia al riesgo; el <strong>Riesgo
+    Controlado</strong> comparte los primeros dos ejes pero colapsa en tolerancia; el
+    <strong>Ex-Víctima del Hype</strong> queda por debajo en casi todas las dimensiones
+    excepto en uso de plataformas, donde los tres perfiles convergen.
+  </p>
+
+  <span class="page-num">17</span>
+</section>
+
+<section class="page" data-screen-label="08 Presupuesto">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">8. Presupuesto del proyecto</h1>
+
+  <h2 class="sub">8.1 Enfoque y supuestos</h2>
+  <p>
+    El presupuesto se ha construido bajo el enfoque de <strong>simulación profesional</strong>:
+    aunque el proyecto se desarrolla en el contexto académico de la asignatura, calculamos
+    los costes como si IronClad Capital fuera una entrega contratada por un cliente real
+    a un equipo de consultoría. Los supuestos de partida son los siguientes:
+  </p>
+  <ul>
+    <li>Seis perfiles profesionales con tarifas diferenciadas (gestión, análisis, técnico,
+      desarrollo y marketing).</li>
+    <li>Una jornada laboral estándar de 8 horas y 240 días laborables/año, sobre la que
+      se calcula el coste por día y por hora.</li>
+    <li>Una tarifa facturada al cliente que incorpora un margen sobre el coste interno
+      (cobertura de overheads + beneficio).</li>
+    <li>Aplicación del IVA del 21% sobre el importe sin impuestos.</li>
+  </ul>
+
+  <h2 class="sub">8.2 Tarifas por rol</h2>
+  <p>
+    La tabla siguiente desglosa para cada rol el salario bruto y neto anual, el coste
+    empresa, su descomposición por día y por hora y, finalmente, la tarifa facturada al
+    cliente — que es la base sobre la que se calcula el presupuesto presentado.
+  </p>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Concepto</th>
+        <th class="num">Jefe de proy.</th>
+        <th class="num">Analista func.</th>
+        <th class="num">Consultor</th>
+        <th class="num">Téc. de sistemas</th>
+        <th class="num">Programador</th>
+        <th class="num">Marketing</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Salario bruto anual</td><td class="num">80.000 €</td><td class="num">70.000 €</td><td class="num">70.000 €</td><td class="num">35.000 €</td><td class="num">35.000 €</td><td class="num">30.000 €</td></tr>
+      <tr><td>Salario neto anual</td><td class="num">53.000 €</td><td class="num">47.000 €</td><td class="num">47.000 €</td><td class="num">26.000 €</td><td class="num">26.000 €</td><td class="num">23.000 €</td></tr>
+      <tr><td>Coste empresa anual</td><td class="num">104.000 €</td><td class="num">94.000 €</td><td class="num">94.000 €</td><td class="num">47.000 €</td><td class="num">47.000 €</td><td class="num">39.000 €</td></tr>
+      <tr><td>Coste / día</td><td class="num">333,33 €</td><td class="num">291,67 €</td><td class="num">291,67 €</td><td class="num">145,83 €</td><td class="num">145,83 €</td><td class="num">125,00 €</td></tr>
+      <tr><td>Coste / hora</td><td class="num">41,67 €</td><td class="num">36,46 €</td><td class="num">36,46 €</td><td class="num">18,23 €</td><td class="num">18,23 €</td><td class="num">15,63 €</td></tr>
+      <tr class="highlight"><td><strong>Tarifa facturada (€/h)</strong></td><td class="num"><strong>52,08 €</strong></td><td class="num"><strong>45,57 €</strong></td><td class="num"><strong>45,57 €</strong></td><td class="num"><strong>22,79 €</strong></td><td class="num"><strong>22,79 €</strong></td><td class="num"><strong>19,53 €</strong></td></tr>
+    </tbody>
+    <caption>Tabla 11. Coste interno y tarifa facturada por cada rol del equipo.</caption>
+  </table>
+
+  <h2 class="sub">8.3 Imputación de horas por rol</h2>
+  <p>
+    Las horas se imputan en función del peso real de cada perfil sobre la naturaleza del
+    proyecto. Los roles técnicos (Técnico de sistemas y Programador) concentran el grueso
+    del esfuerzo, como corresponde a una entrega con componente de análisis cuantitativo
+    y plataforma web.
+  </p>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Rol</th>
+        <th class="num">Horas totales</th>
+        <th class="num">Tarifa (€/h)</th>
+        <th class="num">Total (€)</th>
+        <th>Actividad principal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Jefe de proyecto</td><td class="num">60</td><td class="num">52,08</td><td class="num">3.125,00</td><td>Coordinación, planificación y seguimiento</td></tr>
+      <tr><td>Analista funcional</td><td class="num">80</td><td class="num">45,57</td><td class="num">3.645,83</td><td>Requisitos, segmentación y carteras</td></tr>
+      <tr><td>Consultor</td><td class="num">60</td><td class="num">45,57</td><td class="num">2.734,38</td><td>Asesoría financiera y validación cruzada</td></tr>
+      <tr><td>Técnico de sistemas</td><td class="num">200</td><td class="num">22,79</td><td class="num">4.557,29</td><td>Backend, pipelines, despliegue, CI</td></tr>
+      <tr><td>Programador</td><td class="num">180</td><td class="num">22,79</td><td class="num">4.101,56</td><td>Frontend React + componentes de visualización</td></tr>
+      <tr><td>Marketing</td><td class="num">80</td><td class="num">19,53</td><td class="num">1.562,50</td><td>Web pública, contenidos de blog y diseño</td></tr>
+      <tr class="highlight"><td><strong>Total proyecto</strong></td><td class="num"><strong>660 h</strong></td><td class="num">—</td><td class="num"><strong>19.726,56 €</strong></td><td>Coste sin IVA</td></tr>
+    </tbody>
+    <caption>Tabla 12. Imputación de horas por rol y coste resultante. Total: 660 horas distribuidas entre seis perfiles.</caption>
+  </table>
+
+  <span class="page-num">18</span>
+</section>
+
+<section class="page" data-screen-label="08b Presupuesto resumen">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">8. Presupuesto</h1>
+
+  <h2 class="sub">8.4 Coste por entregable</h2>
+  <p>
+    Cruzando la imputación de horas con los entregables previstos en el contrato, el
+    presupuesto se descompone en cuatro paquetes claramente identificables. Esto
+    facilita al cliente entender exactamente qué está pagando.
+  </p>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Entregable</th>
+        <th>Composición</th>
+        <th class="num">Importe (€)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Memoria técnica PDF (20-25 pág.)</td><td>Jefe de proyecto + Analista (20 h)</td><td class="num">1.953,13</td></tr>
+      <tr><td>Web WordPress + tema personalizado</td><td>Programador + Técnico de sistemas (120 h)</td><td class="num">5.468,75</td></tr>
+      <tr><td>Plugins + Análisis Python/ML</td><td>Técnico + Programador (100 h)</td><td class="num">4.557,29</td></tr>
+      <tr><td>Presentación oral</td><td>Todos los roles (5% del total)</td><td class="num">986,33</td></tr>
+    </tbody>
+    <caption>Tabla 13. Coste por entregable. La suma de paquetes es ilustrativa y se solapa parcialmente con la imputación por rol (no son particiones disjuntas).</caption>
+  </table>
+
+  <h2 class="sub">8.5 Resumen ejecutivo</h2>
+  <div class="grid-3">
+    <div class="stat-card">
+      <div class="k">Horas totales</div>
+      <div class="v">660 h</div>
+      <div class="d">Distribuidas en 6 roles</div>
+    </div>
+    <div class="stat-card">
+      <div class="k">Coste sin IVA</div>
+      <div class="v">19.727 €</div>
+      <div class="d">Horas × tarifa facturada</div>
+    </div>
+    <div class="stat-card">
+      <div class="k">IVA (21%)</div>
+      <div class="v">4.143 €</div>
+      <div class="d">Impuesto sobre el valor añadido</div>
+    </div>
+  </div>
+
+  <table class="data" style="margin-top:4mm">
+    <thead>
+      <tr><th>Concepto</th><th>Detalle</th><th class="num">Importe (€)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Coste total del proyecto</td><td>660 h × tarifas facturadas</td><td class="num">19.726,56</td></tr>
+      <tr><td>IVA</td><td>21% sobre el importe sin impuestos</td><td class="num">+ 4.142,58</td></tr>
+      <tr class="highlight">
+        <td colspan="2"><strong>TOTAL CON IVA · Presupuesto definitivo</strong></td>
+        <td class="num"><strong>23.869,14 €</strong></td>
+      </tr>
+    </tbody>
+    <caption>Tabla 14. Resumen final del presupuesto a presentar al cliente.</caption>
+  </table>
+
+  <div class="callout">
+    <h4>Lectura del presupuesto</h4>
+    <p style="margin:0">
+      El presupuesto presentado al cliente asciende a <strong>23.869,14 € IVA incluido</strong>.
+      Cubre los cuatro entregables (memoria, web, análisis y presentación) repartidos entre
+      seis perfiles profesionales con tarifas diferenciadas. El reparto de horas
+      sobre-pondera los perfiles técnicos porque la naturaleza del proyecto — análisis
+      cuantitativo + plataforma web — lo justifica.
+    </p>
+  </div>
+
+  <h2 class="sub">8.6 Notas adicionales</h2>
+  <ul>
+    <li>El presupuesto no incluye costes de hosting en producción; el prototipo actual
+      funciona dentro de los planes gratuitos de Vercel y Railway.</li>
+    <li>No se ha imputado coste de licencias de datos: <code>yfinance</code> y el dataset
+      Kaggle son gratuitos.</li>
+    <li>Eventuales ampliaciones del alcance (nuevos activos, encuestas a usuarios reales,
+      certificación regulatoria) se presupuestarían por separado.</li>
+  </ul>
+
+  <span class="page-num">19</span>
+</section>
+<!-- ============ 13. ADVERTENCIAS DE RIESGO ============ -->
+
+<section class="page" data-screen-label="09 Advertencias de riesgo">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">9. Advertencias de riesgo y limitaciones</h1>
+
+  <p>
+    IronClad Capital es una <strong>herramienta de análisis de datos financieros</strong>.
+    Las predicciones, señales y carteras que genera son estimaciones estadísticas
+    construidas sobre datos históricos, <em>no garantías de rentabilidad futura</em>. Antes
+    de utilizar cualquier resultado de la plataforma como base para una decisión de
+    inversión real, el usuario debe tener en cuenta las advertencias que recogemos en
+    este apartado. La inclusión explícita de estas limitaciones es parte del compromiso
+    del proyecto con la honestidad metodológica.
+  </p>
+
+  <h2 class="sub">9.1 Sobre las predicciones de precio</h2>
+  <p>
+    Los modelos de predicción implementados (Baseline WMA + regresión lineal, Prophet y
+    LSTM) aprenden de <strong>patrones pasados</strong>. El mercado financiero, y
+    especialmente el mercado cripto, no está obligado a repetir esos patrones. Un cambio
+    regulatorio, una crisis de liquidez en un exchange de referencia o un evento
+    macroeconómico imprevisto pueden invalidar cualquier predicción en cuestión de
+    horas, independientemente del MAE registrado en el periodo de validación.
+  </p>
+  <p>
+    El MAE que mostramos en la plataforma es una <strong>métrica de error promedio
+    calculada sobre datos históricos</strong>. No es el error que cometerá el modelo
+    mañana. A mayor horizonte de predicción, mayor es la incertidumbre acumulada: el MAE
+    a 15 días puede ser hasta 15 veces superior al de 1 día, y los intervalos de
+    confianza reflejados en la plataforma deben interpretarse como <em>orientativos</em>,
+    no como límites estadísticamente garantizados.
+  </p>
+
+  <div class="callout warn">
+    <h4>Implicación operativa</h4>
+    <p style="margin:0">
+      Las predicciones a 10-15 días deben utilizarse exclusivamente como referencia
+      complementaria. Cualquier decisión de inversión basada en un horizonte largo debe
+      apoyarse en información adicional y, preferiblemente, en consejo profesional
+      acreditado.
+    </p>
+  </div>
+
+  <h2 class="sub">9.2 Sobre la segmentación de clientes</h2>
+  <p>
+    Los tres perfiles (Inversor Híbrido, Riesgo Controlado y Ex-Víctima del Hype) se
+    construyeron a partir de un dataset público de Kaggle con 12.000 registros. Aunque
+    el volumen es estadísticamente suficiente para una segmentación inicial, las
+    variables de tolerancia al riesgo y porcentaje en crypto fueron generadas
+    <strong>sintéticamente mediante reglas</strong>, no recogidas mediante encuesta
+    directa a usuarios reales de la plataforma. Esto introduce un sesgo de diseño que
+    los datos no pueden corregir por sí solos: los perfiles son una aproximación
+    razonada, no una medición directa del comportamiento del usuario real de IronClad
+    Capital.
+  </p>
+  <p>
+    Asignar a un usuario a un perfil en función de sus respuestas iniciales tampoco
+    garantiza que ese perfil sea <em>estable en el tiempo</em>. La tolerancia al riesgo
+    no es una constante personal: cambia con la situación económica del inversor, con el
+    ciclo del mercado y con la experiencia acumulada. Un usuario clasificado hoy como
+    Ex-Víctima del Hype puede evolucionar hacia Inversor Híbrido en 18 meses, o puede
+    hacer lo contrario si sufre pérdidas significativas.
+  </p>
+
+  <span class="page-num">20</span>
+</section>
+
+<section class="page" data-screen-label="09b Advertencias continuación">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">9. Advertencias de riesgo</h1>
+
+  <h2 class="sub">9.3 Sobre las carteras recomendadas</h2>
+  <p>
+    Las composiciones de cartera sugeridas por perfil (apartado 7) son
+    <strong>propuestas ilustrativas</strong> basadas en el análisis de riesgo-retorno
+    del periodo 2023–2026. No constituyen asesoramiento financiero personalizado ni
+    tienen en cuenta la situación fiscal, el patrimonio total, los ingresos recurrentes
+    ni los objetivos vitales concretos de ningún usuario.
+  </p>
+  <p>
+    Una cartera con un 40% en LINK-USD puede ser perfectamente razonable para un inversor
+    con un colchón de liquidez sólido y tolerancia real a caídas del 60%; puede ser
+    devastadora para otro con las mismas características sobre el papel pero <em>sin
+    experiencia vivida</em> en un mercado bajista prolongado. El comportamiento real ante
+    una pérdida del 30% solo se conoce cuando esa pérdida ocurre.
+  </p>
+
+  <h2 class="sub">9.4 Sobre los datos históricos y su representatividad</h2>
+  <p>
+    El periodo analizado (enero 2023 — mayo 2026) incluye el <strong>ciclo alcista
+    post-FTX</strong> y la aprobación de los ETF de Bitcoin spot en enero de 2024, dos
+    eventos excepcionales que inflaron los retornos acumulados de los activos cripto
+    respecto a su media histórica de largo plazo. Los retornos del +204% de LINK-USD y
+    del +141% de DOT-USD <strong>no son extrapolables hacia adelante</strong>:
+    representan lo que ocurrió en ese periodo concreto, no lo que ocurrirá en el
+    siguiente.
+  </p>
+  <p>
+    Del mismo modo, el buen comportamiento de ITA durante este periodo está parcialmente
+    explicado por el ciclo de incremento del gasto en defensa de los países OTAN, un
+    factor geopolítico que puede revertirse o moderarse sin previo aviso. El backtesting
+    del análisis del periodo, por tanto, debe leerse como una validación <em>de coherencia
+    interna</em> entre la cartera y el perfil, no como una promesa de rendimientos
+    futuros.
+  </p>
+
+  <h2 class="sub">9.5 Sobre el horizonte temporal y los regímenes de mercado</h2>
+  <ul>
+    <li>Los modelos se han entrenado sobre un único <em>régimen</em> de mercado (alcista
+      mayoritariamente). Su comportamiento en un régimen bajista prolongado no está
+      validado.</li>
+    <li>La validación walk-forward cubre 12 meses; periodos más largos podrían revelar
+      degradaciones del modelo aún no observadas.</li>
+    <li>Las correlaciones entre activos pueden cambiar bruscamente en momentos de estrés
+      de mercado (efecto contagio). La correlación nula LINK-ITA podría no mantenerse en
+      una crisis sistémica.</li>
+  </ul>
+
+  <h2 class="sub">9.6 Principio rector</h2>
+  <div class="callout">
+    <h4>Compromiso del proyecto</h4>
+    <p style="margin:0">
+      IronClad Capital muestra los datos tal como son. Eso incluye sus limitaciones. Una
+      plataforma que oculta el error de sus modelos, que presenta carteras históricas sin
+      advertir del sesgo de selección de periodo, o que clasifica a sus usuarios en
+      perfiles rígidos sin reconocer que esos perfiles son una simplificación, no está
+      democratizando el acceso a la inversión: está reproduciendo exactamente el tipo de
+      ruido del que los inversores necesitan protegerse. Nosotros preferimos ser la
+      plataforma que dice lo que no sabe.
+    </p>
+  </div>
+
+  <span class="page-num">21</span>
+</section>
+
+<!-- ============ 14. CONCLUSIONES ============ -->
+
+<!-- ============ 10. CONCLUSIONES ============ -->
+<section class="page" data-screen-label="10 Conclusiones">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">10. Conclusiones y recomendaciones estratégicas</h1>
+
+  <h2 class="sub">10.1 Conclusiones del análisis financiero</h2>
+  <p>
+    El análisis de LINK-USD, DOT-USD e ITA con datos reales descargados vía
+    <code>yfinance</code> valida la hipótesis de diseño de IronClad Capital: combinar
+    activos cripto de alto potencial con un ETF institucional de baja volatilidad
+    permite construir carteras con perfiles de riesgo-retorno diferenciados y
+    adaptables a distintos tipos de inversor.
+  </p>
+  <p>
+    El Sharpe Ratio confirma que ITA no es un activo de segunda categoría. Es la pieza
+    que permite elevar el Sharpe global de la cartera, reduciendo la covarianza con los
+    activos cripto (correlación LINK-ITA: −0,08, prácticamente nula). Eso tiene un valor
+    real.
+  </p>
+
+  <h2 class="sub">10.2 Conclusiones de la segmentación</h2>
+  <p>
+    Trabajar con 12.000 registros reales confirma que existen al menos tres arquetipos
+    de inversor claramente diferenciados. Los hallazgos más relevantes son:
+  </p>
+  <ul>
+    <li>El perfil <strong>Ex-Víctima del Hype</strong> representa el 74,9% del mercado
+      potencial. Son inversores jóvenes con experiencia limitada que han tomado
+      decisiones emocionales en el pasado y que ahora buscan herramientas de análisis
+      más rigurosas. Es el segmento con mayor volumen y el más receptivo al
+      posicionamiento educativo de la plataforma.</li>
+    <li>El <strong>Inversor Híbrido</strong> (15,7%) es el cliente de mayor valor
+      económico por unidad: ingresos un 43% por encima de la media del dataset, alta
+      tolerancia al riesgo y capacidad para asumir carteras balanceadas entre cripto y
+      ETF. Requiere contenido analítico sofisticado y señales de trading tácticas.</li>
+    <li>El <strong>Riesgo Controlado</strong> (9,4%) tiene el mayor potencial de
+      fidelización: no le importa perderse rentabilidad siempre que las pérdidas sean
+      acotadas. Un mal trimestre puede hacerle abandonar la plataforma, por lo que la
+      comunicación de riesgo tiene que ser proactiva y transparente.</li>
+  </ul>
+
+  <span class="page-num">22</span>
+</section>
+
+<section class="page" data-screen-label="10b Limitaciones y reflexión">
+  <img src="assets/universidad-europea-logo.png" alt="" class="page-logo">
+  <h1 class="section">10. Conclusiones <span class="small" style="font-weight:400"></span></h1>
+
+  <h2 class="sub">10.3 Limitaciones y trabajo futuro</h2>
+  <p>
+    Con honestidad intelectual, hay limitaciones que conviene señalar:
+  </p>
+  <ul>
+    <li>Las variables sintéticas (tolerancia al riesgo, % en crypto) se generaron por
+      reglas, no a partir de encuestas directas. Su calibración es razonada, pero
+      introduce un sesgo de diseño que habrá que validar con datos primarios en futuras
+      iteraciones del proyecto.</li>
+    <li>El modelo de predicción (WMA + regresión lineal) es deliberadamente simple, un
+      baseline. Próximas iteraciones podrán explorar modelos LSTM y Prophet, que han
+      demostrado mejor capacidad predictiva en series temporales financieras con
+      estacionalidad.</li>
+    <li>La segmentación por reglas es interpretable pero no óptima estadísticamente. Un
+      clustering K-Means o DBSCAN podría revelar segmentos que los umbrales fijos no
+      capturan.</li>
+  </ul>
+
+  <h2 class="sub">10.4 Reflexión final</h2>
+  <p>
+    Con esta entrega hemos demostrado que IronClad Capital funciona de principio a fin
+    con datos reales: el pipeline descarga, limpia y analiza correctamente, los
+    gráficos se entienden, y los resultados son útiles para tomar decisiones. Los tres
+    perfiles no son una división arbitraria. Están respaldados por los datos y cubren
+    bien el abanico de inversores al que va dirigida la plataforma: el segmento
+    millennial-Z con interés en activos digitales.
+  </p>
+  <p>
+    Todo lo presentado es reproducible y verificable: código comentado, métricas
+    estándar y dataset público. Esa es exactamente la propuesta de valor de IronClad
+    Capital. En un mercado lleno de predicciones vacías, nosotros mostramos los datos
+    tal como son.
+  </p>
+
+  <div class="callout">
+    <h4>Cierre</h4>
+    <p style="margin:0">
+      Gracias al profesor <strong>Gabriel Marín Díaz</strong> por el seguimiento durante
+      el curso y a los compañeros de M11 por las conversaciones que afilaron el alcance
+      del proyecto. Cualquier comentario, crítica o pregunta es bienvenido en la defensa.
+    </p>
+  </div>
+
+  <span class="page-num">23</span>
+</section>
+
+</body>
+</html>
